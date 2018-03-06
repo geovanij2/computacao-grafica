@@ -91,10 +91,34 @@ class Object {
 		}
 
 	protected:
+		void add_coordinate(double x, double y) {
+			_coords.emplace_back(x,y);
+		}
 
+		void add_coordinate(const Coordinate& coord) {
+			_coords.push_back(coord);
+		}
+
+		void add_coordinate(const Coordinates& coords) {
+			_coords.insert(_coords.end(), coords.begin(), coords.end());
+		}
 	private:
-		std::string _name;
+		const std::string _name;
 		Coordinates _coords;
 };
+
+class Point : public Object {
+	Point(str::string name, double x, double y) :
+		_name(name)
+	{
+		this->add_coordinate(x,y)
+	}
+
+	Point(str::string name, Coordinate coord) :
+		_name(name),
+	{
+		this->add_coordinate(coord)
+	}
+}
 
 #endif
