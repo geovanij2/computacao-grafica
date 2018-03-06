@@ -2,7 +2,7 @@
 <!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.0"/>
-  <object class="GtkWindow" id="add_element_window">
+  <object class="GtkWindow" id="add_geometric_shape_w">
     <property name="can_focus">False</property>
     <child>
       <object class="GtkBox" id="box16">
@@ -15,12 +15,12 @@
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <child>
-              <object class="GtkButton" id="add_element_point">
+              <object class="GtkButton" id="add_point1">
                 <property name="label" translatable="yes">Add Point</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_add_element_point_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_add_point1_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -41,7 +41,7 @@
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <child>
-              <object class="GtkButton" id="add_element_line">
+              <object class="GtkButton" id="add_line1">
                 <property name="label" translatable="yes">Add Line</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -67,12 +67,12 @@
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <child>
-              <object class="GtkButton" id="add_element_polygon">
+              <object class="GtkButton" id="add_poly1">
                 <property name="label" translatable="yes">Add Polygon</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_add_element_polygon_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_add_poly1_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -90,7 +90,7 @@
       </object>
     </child>
   </object>
-  <object class="GtkWindow" id="add_line_window">
+  <object class="GtkWindow" id="add_line_w">
     <property name="can_focus">False</property>
     <child>
       <object class="GtkBox" id="box6">
@@ -114,7 +114,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="name_line">
+              <object class="GtkEntry" id="name_line_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -148,7 +148,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="x1_line">
+              <object class="GtkEntry" id="x1_line_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -171,7 +171,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="y1_line">
+              <object class="GtkEntry" id="y1_line_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -205,7 +205,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="x2_line">
+              <object class="GtkEntry" id="x2_line_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -228,7 +228,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="y2_line">
+              <object class="GtkEntry" id="y2_line_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -263,7 +263,7 @@
       </object>
     </child>
   </object>
-  <object class="GtkWindow" id="add_point_window">
+  <object class="GtkWindow" id="add_point_w">
     <property name="can_focus">False</property>
     <child>
       <object class="GtkBox" id="box9">
@@ -287,7 +287,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="name_poin">
+              <object class="GtkEntry" id="name_point_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -321,7 +321,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="x1_point">
+              <object class="GtkEntry" id="x1_point_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -344,7 +344,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="y1_point">
+              <object class="GtkEntry" id="y1_point_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -378,7 +378,7 @@
       </object>
     </child>
   </object>
-  <object class="GtkWindow" id="add_poly_window">
+  <object class="GtkWindow" id="add_poly_w">
     <property name="can_focus">False</property>
     <child>
       <object class="GtkBox" id="box2">
@@ -402,7 +402,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="name_poly">
+              <object class="GtkEntry" id="name_poly_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -436,7 +436,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="x_point1">
+              <object class="GtkEntry" id="x_poly_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -459,7 +459,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="y_point1">
+              <object class="GtkEntry" id="y_poly_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>
@@ -482,12 +482,12 @@
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
             <child>
-              <object class="GtkButton" id="add_points">
+              <object class="GtkButton" id="add_point_poly">
                 <property name="label" translatable="yes">Adiciona coordenada</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_add_points_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_add_point_poly_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -496,12 +496,12 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="add_points_ok">
+              <object class="GtkButton" id="add_poly">
                 <property name="label" translatable="yes">Finalizar</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <signal name="clicked" handler="on_add_points_ok_clicked" swapped="no"/>
+                <signal name="clicked" handler="on_add_poly_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">True</property>
@@ -519,7 +519,7 @@
       </object>
     </child>
   </object>
-  <object class="GtkWindow" id="main_window">
+  <object class="GtkWindow" id="main_w">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">Computação Gráfica</property>
     <property name="window_position">center</property>
@@ -829,7 +829,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <child>
-                              <object class="GtkTreeView" id="object_list1">
+                              <object class="GtkTreeView" id="object_tree">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="search_column">0</property>
