@@ -7,7 +7,7 @@ class Window
 {
   public:
     Window(double width, double height):
-      _lowmin(0,0), _lowmax(height,0), _uppermin(width,0), _uppermax(width, height){}
+      _lowmin(0,0), _lowmax(width,0), _uppermin(0,height), _uppermax(width, height){}
       virtual ~Window() {} 
 
        void zoom(double step);
@@ -23,28 +23,35 @@ class Window
 void Window::zoom(double step)
 {
   step /= 2;
-  _lowmin += step;
-  _uppermax -= step;
-  _lowmax.x -= step;
-  _lowmax.y += step;
-  _uppermin.x += step;
-  _uppermin.y -= step;
+  Coordinate coord_e(step, step);
+  Coordinate coord_d(step, -step);
+
+  _lowmin += coord_e;
+  _uppermax -= coord_e;
+  _lowmax -= coord_d;
+  _uppermin += coord_d;
+
+
 }
 
 /* Move Window Horizontally */
 void Window::moveX(double value)
 {
-  _lowmin.x += value;
-  _lowmax.x += value;
-  _uppermin.x += value;
-  _uppermax.x += value;
+  Coordinate coord(value, 0);
+  _lowmin += coord;
+  _lowmax += coord;
+  _uppermin += coord;
+  _uppermax += coord;
 }
 
 /* Move Window Vertically */
 void Window::moveY(double value)
 {
-  _lowmin.y += value;
-  _lowmax.y += value;
-  _uppermin.y += value;
-  _uppermax.y += value;
+  Coordinate coord(0, value);
+  _lowmin += coord;
+  _lowmax += coord;
+  _uppermin += coord;
+  _uppermax += coord;
 }
+
+#endif
