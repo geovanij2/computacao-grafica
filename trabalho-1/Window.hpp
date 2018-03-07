@@ -14,6 +14,12 @@ class Window
        void moveX(double value);
        void moveY(double value);
 
+       Coordinate lowmin() const { return _lowmin; }
+       Coordinate uppermax() const { return _uppermax; }
+       void printteste(){
+        printf("%f\n", _lowmin.x);
+       }
+
   protected:
   private:
     Coordinate _lowmin, _lowmax, _uppermin, _uppermax;
@@ -30,8 +36,6 @@ void Window::zoom(double step)
   _uppermax -= coord_e;
   _lowmax -= coord_d;
   _uppermin += coord_d;
-
-
 }
 
 /* Move Window Horizontally */
@@ -42,6 +46,7 @@ void Window::moveX(double value)
   _lowmax += coord;
   _uppermin += coord;
   _uppermax += coord;
+
 }
 
 /* Move Window Vertically */
@@ -52,6 +57,7 @@ void Window::moveY(double value)
   _lowmax += coord;
   _uppermin += coord;
   _uppermax += coord;
+
 }
 
 #endif
