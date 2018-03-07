@@ -114,13 +114,13 @@ class Point : public Object {
 		Point(std::string name, double x, double y) :
 			Object(name)
 		{
-			this->add_coordinate(x,y)
+			this->add_coordinate(x,y);
 		}
 
 		Point(std::string name, Coordinate coord) :
-			Object(name),
+			Object(name)
 		{
-			this->add_coordinate(coord)
+			this->add_coordinate(coord);
 		}
 
 		virtual ~Point() {}
@@ -163,8 +163,8 @@ class Line : public Object {
 
 		~Line() {}
 
-		virtual ObjType getType() const {
-			return ObjType::LINE;
+		virtual obj_type getType() const {
+			return obj_type::LINE;
 		}
 
 		virtual std::string getTypeName() const {
@@ -187,8 +187,8 @@ class Polygon : public Object {
 
 		virtual ~Polygon() {}
 
-		virtual ObjType getType() const {
-			return ObjType::POLYGON;
+		virtual obj_type getType() const {
+			return obj_type::POLYGON;
 		}
 
 		virtual std::string getTypeName() const {
