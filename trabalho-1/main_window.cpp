@@ -1,7 +1,10 @@
 #include <gtk/gtk.h>
 #include <stdlib.h>  
+#include "Viewport.hpp"
+#include "objects.hpp"
 
 //Objetos da main window
+Viewport* viewport;
 GObject *main_w;
 GtkListStore  *store;
 GtkTreeIter iter;
@@ -61,31 +64,30 @@ void fill_treeview(const char* name,const char* type);
 /* MAIN_W */
 void on_zoom_in_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  printf ("Zoom in\n");
+  viewport->zoom(10);
 }
 void on_zoom_out_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  printf ("Zoom out\n");
+  viewport->zoom(-10);
 }
 void on_up_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  printf ("Up\n");
+  viewport->moveY(10);
 }
 void on_down_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  printf ("Down\n");
+  viewport->moveY(-10);
 }
 void on_left_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  printf ("Left\n");
+  viewport->moveX(-10);
 }
 void on_right_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  printf ("Right\n");
+  viewport->moveX(10); 
 }
 void on_add_object_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  printf ("New Object\n");
   gtk_widget_show (GTK_WIDGET(add_geometric_shape_w));
 }
 /* ADD_GEOMETRIC_W */
@@ -107,7 +109,7 @@ void on_add_point_clicked (GtkWidget *widget, gpointer   data)
   const gchar* name = gtk_entry_get_text(name_point_entry);
   double x1 = atof(gtk_entry_get_text(x1_point_entry));
   double y1 = atof(gtk_entry_get_text(y1_point_entry));
-  printf("%s(%f,%f)\n",name,x1,y1);
+ 
   fill_treeview(name,"Point");
 }
 /* ADD_LINE_W */
@@ -118,7 +120,7 @@ void on_add_line_clicked (GtkWidget *widget, gpointer   data)
   double y1 = atof(gtk_entry_get_text(y1_line_entry));
   double x2 = atof(gtk_entry_get_text(x2_line_entry));
   double y2 = atof(gtk_entry_get_text(y2_line_entry));
-  printf("%s(%f,%f),(%f,%f)\n",name,x1,y1,x2,y2);
+
   fill_treeview(name,"Line");
 }
 /* ADD_POLY */
@@ -127,7 +129,6 @@ void on_add_point_poly_clicked (GtkWidget *widget, gpointer   data)
   const gchar* name = gtk_entry_get_text(name_poly_entry);
   double x1 = atof(gtk_entry_get_text(x_poly_entry));
   double y1 = atof(gtk_entry_get_text(y_poly_entry));
-  printf("%s(%f,%f)\n",name,x1,y1);
 }
 
 void on_add_poly_clicked (GtkWidget *widget, gpointer   data)
@@ -145,22 +146,21 @@ gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data)
   cairo_set_source_rgb (cr, 1, 0, 0);
   cairo_set_line_width(cr, 0.5);
 
-  double width = gtk_widget_get_allocated_width (widget);
-  double height = gtk_widget_get_allocated_height (widget);
+  //double width = gtk_widget_get_allocated_width (widget);
+  //double height = gtk_widget_get_allocated_height (widget);
    
    //550x535
    //25+500+25
    //18+500+17
-  cairo_move_to(cr, 25, 18);
+  /*cairo_move_to(cr, 25, 18);
   cairo_line_to(cr, 525, 18);
   cairo_line_to(cr, 525, 517);
   cairo_line_to(cr, 25, 517);
   cairo_line_to(cr, 25, 18);
-  cairo_stroke(cr);
+  cairo_stroke(cr);*/
+  
+  viewport->drawDisplayFile(cr);
 
-  printf("width:%f\n", width);
-  printf("height:%f\n", height);
-    
   cairo_set_source_rgb(cr, 0, 0, 0);
   cairo_set_line_width(cr, 1);
 
@@ -210,7 +210,9 @@ int main (int   argc, char *argv[])
   main_w = gtk_builder_get_object (builder, "main_w");
   g_signal_connect (main_w, "destroy", G_CALLBACK (gtk_main_quit), NULL);
   gtk_window_set_resizable (GTK_WINDOW(main_w),  false);
-  
+
+  /* Tamanho da viewport */
+  viewport = new Viewport(550,535); 
   /* Connect Treeview*/
   objects_tree = GTK_TREE_VIEW(gtk_builder_get_object(builder, "object_tree"));
   create_treeview();
