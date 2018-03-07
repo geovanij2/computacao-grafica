@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <iostream>
 
 class Coordinate {
 	public:
@@ -33,6 +34,11 @@ class Coordinate {
 
  		bool operator==(const Coordinate& other) {
  			return (this->x == other.x && this->y == other.y);
+ 		}
+
+ 		friend std::ostream& operator<<(std::ostream& os, const Coordinate& coord) {
+ 			os << '(' << coord.x << ',' << coord.y << ')';
+ 			return os;
  		}
 
  		double x, y;
@@ -89,6 +95,14 @@ class Object {
 
 		Object& operator*() {
 			return *this;
+		}
+
+		friend std::ostream& operator<<(std::ostream& os, const Object& obj) {
+			os << obj.get_name() << ": [";
+			for (auto i = obj._coords.begin(); i != obj._coords.end(); ++i)
+				os << *i << ',';
+			os << ']';
+			return os;
 		}
 
 	protected:
@@ -156,7 +170,7 @@ class Line : public Object {
 			Object(name)
 		{
 			if (coords.size() != 2) {
-				throw std::out_of_range("vector size must be 2 to construct a line");
+				throw "vector size must be 2 to construct a line";
 			}
 			this->add_coordinate(coords);
 		}
@@ -180,7 +194,7 @@ class Polygon : public Object {
 			Object(name)
 		{
 			if (coords.size() < 3) {
-				throw std::out_of_range("Polygon must have at least 3 coordinates");
+				throw "Polygon must have at least 3 coordinates";
 			}
 			this->add_coordinate(coords);
 		}
