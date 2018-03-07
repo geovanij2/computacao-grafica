@@ -1,11 +1,11 @@
-#include "Elemento.hpp"
+#include "elemento.hpp"
 #include <stdexcept>
 
 template<typename T>
 class ListaEnc {
 
 public:
-	ListaEnc()
+	ListaEnc();
 	~ListaEnc();
 	// inicio
 	void adicionaNoInicio(const T& dado);
@@ -32,6 +32,7 @@ public:
 private:
 	Elemento<T>* head;
 	int size;
+};
 
 template<typename T>
 ListaEnc<T>::ListaEnc() {
@@ -68,7 +69,7 @@ T ListaEnc<T>::retiraDoInicio() {
 template<typename T>
 void ListaEnc<T>::eliminaDoInicio() {
 	if (this->listaVazia())
-		throw std::out_of_range("lista vazia")
+		throw std::out_of_range("lista vazia");
 	Elemento<T>* inicio = this->head;
 	this->head = inicio->getProximo();
 	this->size--;
@@ -84,7 +85,7 @@ void ListaEnc<T>::adicionaNaPosicao(const T& dado, int pos) {
 		throw std::out_of_range("posicao invalida");
 	} else {
 		Elemento<T>* anterior = this->head;
-		for (int i = 1; i < index; i++) {
+		for (int i = 1; i < pos; i++) {
 			anterior = anterior->getProximo();
 		}
 		Elemento<T>* novo_elemento = new Elemento<T>(dado, anterior->getProximo());
@@ -100,7 +101,7 @@ int ListaEnc<T>::posicao(const T& dado) const {
 	}
 	Elemento<T>* elemento = this->head;
 	int indice = 0;
-	while (elemento->getInfo() != dado)) {
+	while (elemento->getInfo() != dado) {
 		elemento = elemento->next();
 		indice++;
 		if (elemento == nullptr) {
@@ -116,7 +117,7 @@ T* ListaEnc<T>::posicaoMem(const T& dado) const {
 		throw std::out_of_range("lista vazia");
 	}
 	Elemento<T>* elemento = this->head;
-	while (elemento->getInfo() != dado)) {
+	while (elemento->getInfo() != dado) {
 		elemento = elemento->next();
 		if (elemento == nullptr) {
 			throw std::out_of_range("dado nao encontrado");
@@ -172,7 +173,7 @@ T ListaEnc<T>::retira() {
 }
 
 template<typename T>
-T ListEnc<T>::retiraEspecifico(const T& dado) {
+T ListaEnc<T>::retiraEspecifico(const T& dado) {
 	return this->retiraDaPosicao(this->posicao(dado));
 }
 
@@ -186,7 +187,7 @@ void ListaEnc<T>::adicionaEmOrdem(const T& dado) {
 		atual = atual->getProximo();
 		indice++;
 	}
-	if (data > atual->getInfo()) {
+	if (dado > atual->getInfo()) {
 		return this->adicionaNaPosicao(dado, indice + 1);
 	} else {
 		return this->adicionaNaPosicao(dado, indice + 1);
