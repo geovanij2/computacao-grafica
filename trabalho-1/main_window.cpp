@@ -147,13 +147,19 @@ gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data)
 
   double width = gtk_widget_get_allocated_width (widget);
   double height = gtk_widget_get_allocated_height (widget);
-    
-  cairo_move_to(cr, 20, 20);
-  cairo_line_to(cr, width-20, 20);
-  cairo_line_to(cr, width-20, height-20);
-  cairo_line_to(cr, 20,height-20);
-  cairo_line_to(cr, 20, 20);
+   
+   //550x535
+   //25+500+25
+   //18+500+17
+  cairo_move_to(cr, 25, 18);
+  cairo_line_to(cr, 525, 18);
+  cairo_line_to(cr, 525, 517);
+  cairo_line_to(cr, 25, 517);
+  cairo_line_to(cr, 25, 18);
   cairo_stroke(cr);
+
+  printf("width:%f\n", width);
+  printf("height:%f\n", height);
     
   cairo_set_source_rgb(cr, 0, 0, 0);
   cairo_set_line_width(cr, 1);
@@ -203,6 +209,7 @@ int main (int   argc, char *argv[])
   /* Connect signal handlers to the constructed widgets. */
   main_w = gtk_builder_get_object (builder, "main_w");
   g_signal_connect (main_w, "destroy", G_CALLBACK (gtk_main_quit), NULL);
+  gtk_window_set_resizable (GTK_WINDOW(main_w),  false);
   
   /* Connect Treeview*/
   objects_tree = GTK_TREE_VIEW(gtk_builder_get_object(builder, "object_tree"));
@@ -210,6 +217,7 @@ int main (int   argc, char *argv[])
 
   draw_viewport = GTK_WIDGET(gtk_builder_get_object(builder, "draw_viewport"));
   g_signal_connect(draw_viewport, "draw", G_CALLBACK(draw_objects), NULL);
+ 
   /* Buttons */
   zoom_out = GTK_BUTTON(gtk_builder_get_object(builder, "zoom_out"));
   g_signal_connect (zoom_out, "clicked", G_CALLBACK (on_zoom_out_button_clicked), NULL);
