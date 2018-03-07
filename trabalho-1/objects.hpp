@@ -170,7 +170,7 @@ class Line : public Object {
 			Object(name)
 		{
 			if (coords.size() != 2) {
-				throw std::out_of_range("vector size must be 2 to construct a line");
+				throw "vector size must be 2 to construct a line";
 			}
 			this->add_coordinate(coords);
 		}
@@ -194,7 +194,7 @@ class Polygon : public Object {
 			Object(name)
 		{
 			if (coords.size() < 3) {
-				throw std::out_of_range("Polygon must have at least 3 coordinates");
+				throw "Polygon must have at least 3 coordinates";
 			}
 			this->add_coordinate(coords);
 		}
