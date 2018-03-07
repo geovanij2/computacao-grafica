@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 class Coordinate {
 	public:
@@ -63,7 +64,7 @@ class Object {
 		}
 
 		virtual std::string get_type_name() const {
-			return "OBJECT";
+			return "Object";
 		}
 
 		Coordinates& get_coords() {
@@ -108,17 +109,93 @@ class Object {
 };
 
 class Point : public Object {
-	Point(str::string name, double x, double y) :
-		_name(name)
-	{
-		this->add_coordinate(x,y)
-	}
 
-	Point(str::string name, Coordinate coord) :
-		_name(name),
-	{
-		this->add_coordinate(coord)
-	}
-}
+	public:
+		Point(std::string name, double x, double y) :
+			Object(name)
+		{
+			this->add_coordinate(x,y)
+		}
+
+		Point(std::string name, Coordinate coord) :
+			Object(name),
+		{
+			this->add_coordinate(coord)
+		}
+
+		virtual ~Point() {}
+
+		virtual obj_type get_type() const {
+			return obj_type::POINT;
+		}
+
+		virtual std::string get_type_name() const {
+			return "Point";
+		}
+	protected:
+	private:
+};
+
+class Line : public Object {
+	public:
+		Line(std::string name, double xi, double yi, double xf, double yf) :
+			Object(name)
+		{
+			this->add_coordinate(xi,yi);
+			this->add_coordinate(xf,yf);
+		}
+
+		Line(std::string name, Coordinate initial_coord, Coordinate final_coord) :
+			Object(name)
+		{
+			this->add_coordinate(initial_coord);
+			this->add_coordinate(final_coord);
+		}
+
+		Line(std::string name, Coordinates coords) :
+			Object(name)
+		{
+			if (coords.size() != 2) {
+				throw std::out_of_range("vector size must be 2 to construct a line");
+			}
+			this->add_coordinate(coords);
+		}
+
+		~Line() {}
+
+		virtual ObjType getType() const {
+			return ObjType::LINE;
+		}
+
+		virtual std::string getTypeName() const {
+			return "Line";
+		}
+	protected:
+	private:
+};
+
+class Polygon : public Object {
+	public:
+		Polygon(std::string name, Coordinates coords) :
+			Object(name)
+		{
+			if (coords.size() < 3) {
+				throw std::out_of_range("Polygon must have at least 3 coordinates");
+			}
+			this->add_coordinate(coords);
+		}
+
+		virtual ~Polygon() {}
+
+		virtual ObjType getType() const {
+			return ObjType::POLYGON;
+		}
+
+		virtual std::string getTypeName() const {
+			return "Polygon";
+		}
+	protected:
+	private:
+};
 
 #endif
