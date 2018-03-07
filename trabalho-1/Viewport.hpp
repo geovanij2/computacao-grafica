@@ -17,6 +17,7 @@ class Viewport
     void moveX(double value);
     void moveY(double value);
     void drawDisplayFile(cairo_t* cr);
+    void addObject(Object* obj) { _objetos.adiciona(obj); };
 
     Coordinate transformOneCoordinate(const Coordinate& c) const;
     Coordinates transformOneCoordinates(const Coordinates& coords) const;
@@ -24,11 +25,11 @@ class Viewport
   private:
     Window* _window;
   	double _width, _height;
-    ListaEnc<Object*> *_objetos;
+    ListaEnc<Object*> _objetos;
 
-	void drawPoint(Object objeto, cairo_t* cr);
-    void drawLine(Object objeto, cairo_t* cr);
-    void drawPolygon(Object objeto, cairo_t* cr);
+	  void drawPoint(Object* objeto, cairo_t* cr);
+    void drawLine(Object* objeto, cairo_t* cr);
+    void drawPolygon(Object* objeto, cairo_t* cr);
 
 };
 
@@ -48,7 +49,6 @@ Coordinate Viewport::transformOneCoordinate(const Coordinate& coord) const {
 
     double xvp = ((coord.x-lowmin.x)/(uppermax.x-lowmin.x))*_width;
     double yvp = (1-((coord.y-lowmin.y)/(uppermax.y-lowmin.y)))*_height;
-    printf("(%f,%f) virou (%f,%f)\n", coord.x, coord.y, xvp, yvp);
     return Coordinate(xvp,yvp);
 }
 
@@ -59,22 +59,22 @@ Coordinates Viewport::transformOneCoordinates(const Coordinates& coords) const {
 	return transformed_vector;
 }
 
-void Viewport::drawPoint(Object objeto, cairo_t* cr){
-    Coordinate coord = transformOneCoordinate(objeto.get_coord_at_index(0));
+void Viewport::drawPoint(Object* objeto, cairo_t* cr){
+    Coordinate coord = transformOneCoordinate(objeto->get_coord_at_index(0));
     //prepareContext();
     cairo_move_to(cr, coord.x, coord.y);
     cairo_arc(cr, coord.x, coord.y, 1.0, 0.0, (2*G_PI) );
     cairo_fill(cr);
 }
 
-void Viewport::drawLine(Object objeto, cairo_t* cr) {
-	Coordinates transformed_vector = transformOneCoordinates(objeto.get_coords());
+void Viewport::drawLine(Object* objeto, cairo_t* cr) {
+	Coordinates transformed_vector = transformOneCoordinates(objeto->get_coords());
 	cairo_move_to(cr, transformed_vector[0].x, transformed_vector[0].y);
 	cairo_line_to(cr, transformed_vector[1].x, transformed_vector[1].y);
 	cairo_stroke(cr);
 }
-void Viewport::drawPolygon(Object obj,cairo_t* cr) {
-	Coordinates transformed_vector = transformOneCoordinates(obj.get_coords());
+void Viewport::drawPolygon(Object* obj,cairo_t* cr) {
+	Coordinates transformed_vector = transformOneCoordinates(obj->get_coords());
 	cairo_move_to(cr, transformed_vector[0].x, transformed_vector[0].y);
 	for (int i = 1; i < transformed_vector.size(); ++i)
 		cairo_line_to(cr, transformed_vector[i].x, transformed_vector[i].y);
@@ -91,7 +91,22 @@ void Viewport::drawDisplayFile(cairo_t* cr){
   cairo_stroke(cr);
 
   //percorrer o displayfile enviando os objetos para o respectivo draw
-
+  for (int i = 0; i < _objetos.tamanho(); ++i) {
+    auto teste = _objetos.retornaDaPosicao(i);
+    switch(teste->get_type()) {
+      case obj_type::OBJECT:
+        break;
+      case obj_type::POINT:
+        drawPoint(teste, cr);
+        break;
+      case obj_type::LINE:
+        drawLine(teste, cr);
+        break;
+      case obj_type::POLYGON:
+        drawPolygon(teste, cr);
+        break;
+    }
+  }
 }
 
 #endif

@@ -177,11 +177,11 @@ class Line : public Object {
 
 		~Line() {}
 
-		virtual obj_type getType() const {
+		virtual obj_type get_type() const {
 			return obj_type::LINE;
 		}
 
-		virtual std::string getTypeName() const {
+		virtual std::string get_type_name() const {
 			return "Line";
 		}
 	protected:
@@ -201,7 +201,7 @@ class Polygon : public Object {
 
 		virtual ~Polygon() {}
 
-		virtual obj_type getType() const {
+		virtual obj_type get_type() const {
 			return obj_type::POLYGON;
 		}
 

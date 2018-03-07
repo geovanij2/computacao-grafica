@@ -5,6 +5,8 @@
 
 //Objetos da main window
 Viewport* viewport;
+Coordinates polygon_coords;
+
 GObject *main_w;
 GtkListStore  *store;
 GtkTreeIter iter;
@@ -111,6 +113,9 @@ void on_add_point_clicked (GtkWidget *widget, gpointer   data)
   double y1 = atof(gtk_entry_get_text(y1_point_entry));
  
   fill_treeview(name,"Point");
+
+  Point* point = new Point(name, x1, y1);
+  viewport->addObject(point);
 }
 /* ADD_LINE_W */
 void on_add_line_clicked (GtkWidget *widget, gpointer   data)
@@ -122,6 +127,9 @@ void on_add_line_clicked (GtkWidget *widget, gpointer   data)
   double y2 = atof(gtk_entry_get_text(y2_line_entry));
 
   fill_treeview(name,"Line");
+  Line* line = new Line(name, x1, y1, x2, y2);
+  viewport->addObject(line);
+
 }
 /* ADD_POLY */
 void on_add_point_poly_clicked (GtkWidget *widget, gpointer   data)
@@ -129,12 +137,16 @@ void on_add_point_poly_clicked (GtkWidget *widget, gpointer   data)
   const gchar* name = gtk_entry_get_text(name_poly_entry);
   double x1 = atof(gtk_entry_get_text(x_poly_entry));
   double y1 = atof(gtk_entry_get_text(y_poly_entry));
+  polygon_coords.push_back(Coordinate(x1,y1));
 }
 
 void on_add_poly_clicked (GtkWidget *widget, gpointer   data)
 {
   const gchar* name = gtk_entry_get_text(name_poly_entry);
   fill_treeview(name,"Polygon");
+  Polygon* polygon = new Polygon(name, polygon_coords);
+  viewport->addObject(polygon);
+  polygon_coords.clear();
 }
 
 gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) 

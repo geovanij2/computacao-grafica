@@ -17,6 +17,7 @@ public:
 	T* posicaoMem(const T& dado) const;
 	bool contem(const T& dado);
 	T retiraDaPosicao(int pos);
+	T retornaDaPosicao(int pos);
 	//fim
 	void adiciona(const T& dado);
 	T retira();
@@ -28,6 +29,7 @@ public:
 	bool maior(T dado1, T dado2);
 	bool menor(T dado1, T dado2);
 	void destroiLista();
+	int tamanho() { return this->size; };
 
 private:
 	Elemento<T>* head;
@@ -157,6 +159,19 @@ T ListaEnc<T>::retiraDaPosicao(int pos) {
 	}
 }
 
+template<typename T>
+T ListaEnc<T>::retornaDaPosicao(int pos) {
+	if (this->listaVazia()) {
+		throw "erro lista vazia";
+	} else if (pos < 0 || pos > this->size - 1) {
+		throw "pos invalida";
+	} 
+	Elemento<T>* elemento;
+	elemento = this->head;
+	for (int i = 0; i < pos; ++i)
+		elemento = elemento->getProximo();
+	return elemento->getInfo();
+}
 //fim
 template<typename T>
 void ListaEnc<T>::adiciona(const T& dado) {
@@ -216,7 +231,7 @@ bool ListaEnc<T>::menor(T dado1, T dado2) {
 
 template<typename T>
 void ListaEnc<T>::destroiLista() {
-	Elemento<T>* atual, anterior;
+	Elemento<T> *atual, *anterior;
 	atual = this->head;
 	for (int i = 0; i < this->size; i++) {
 		anterior = atual;
