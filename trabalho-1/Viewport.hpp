@@ -26,9 +26,9 @@ class Viewport
   	double _width, _height;
     ListaEnc<Object*> *_objetos;
 
-	void drawPoint(Object* objeto, cairo_t* cr);
-    void drawLine(Object* objeto, cairo_t* cr);
-    void drawPolygon(Object* objeto, cairo_t* cr);
+	void drawPoint(Object objeto, cairo_t* cr);
+    void drawLine(Object objeto, cairo_t* cr);
+    void drawPolygon(Object objeto, cairo_t* cr);
 
 };
 
@@ -52,8 +52,6 @@ Coordinate Viewport::transformOneCoordinate(const Coordinate& coord) const {
     return Coordinate(xvp,yvp);
 }
 
-void Viewport::drawPoint(Object* objeto, cairo_t* cr){
-    //Coordinate coord = transformCoordinate(obj->getCoord(0));
 Coordinates Viewport::transformOneCoordinates(const Coordinates& coords) const {
 	Coordinates transformed_vector;
 	for (int i = 0; i < coords.size(); ++i)
@@ -61,14 +59,28 @@ Coordinates Viewport::transformOneCoordinates(const Coordinates& coords) const {
 	return transformed_vector;
 }
 
+void Viewport::drawPoint(Object objeto, cairo_t* cr){
+    Coordinate coord = transformOneCoordinate(objeto.get_coord_at_index(0));
     //prepareContext();
-    //cairo_move_to(_cairo, coord.x, coord.y);
-    //cairo_arc(_cairo, coord.x, coord.y, 1.0, 0.0, (2*PI) );
-    //cairo_fill(_cairo);
+    cairo_move_to(cr, coord.x, coord.y);
+    cairo_arc(cr, coord.x, coord.y, 1.0, 0.0, (2*G_PI) );
+    cairo_fill(cr);
 }
 
-void Viewport::drawLine(Object* obj, cairo_t* cr){}
-void Viewport::drawPolygon(Object* obj,cairo_t* cr){}
+void Viewport::drawLine(Object objeto, cairo_t* cr) {
+	Coordinates transformed_vector = transformOneCoordinates(objeto.get_coords());
+	cairo_move_to(cr, transformed_vector[0].x, transformed_vector[0].y);
+	cairo_line_to(cr, transformed_vector[1].x, transformed_vector[1].y);
+	cairo_stroke(cr);
+}
+void Viewport::drawPolygon(Object obj,cairo_t* cr) {
+	Coordinates transformed_vector = transformOneCoordinates(obj.get_coords());
+	cairo_move_to(cr, transformed_vector[0].x, transformed_vector[0].y);
+	for (int i = 1; i < transformed_vector.size(); ++i)
+		cairo_line_to(cr, transformed_vector[i].x, transformed_vector[i].y);
+	cairo_line_to(cr, transformed_vector[0].x, transformed_vector[0].y);
+	cairo_stroke(cr);
+}
 
 void Viewport::drawDisplayFile(cairo_t* cr){
   cairo_move_to(cr, 25, 18);
