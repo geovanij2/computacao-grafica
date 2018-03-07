@@ -19,6 +19,7 @@ class Viewport
     void drawDisplayFile(cairo_t* cr);
 
     Coordinate transformOneCoordinate(const Coordinate& c) const;
+    Coordinates transformOneCoordinates(const Coordinates& coords) const;
   protected:
   private:
     Window* _window;
@@ -53,6 +54,13 @@ Coordinate Viewport::transformOneCoordinate(const Coordinate& coord) const {
 
 void Viewport::drawPoint(Object* objeto, cairo_t* cr){
     //Coordinate coord = transformCoordinate(obj->getCoord(0));
+Coordinates Viewport::transformOneCoordinates(const Coordinates& coords) const {
+	Coordinates transformed_vector;
+	for (int i = 0; i < coords.size(); ++i)
+		transformed_vector.push_back(transformOneCoordinate(coords[i]));
+	return transformed_vector;
+}
+
     //prepareContext();
     //cairo_move_to(_cairo, coord.x, coord.y);
     //cairo_arc(_cairo, coord.x, coord.y, 1.0, 0.0, (2*PI) );
