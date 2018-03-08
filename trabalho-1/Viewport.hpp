@@ -3,8 +3,8 @@
 
 #include "Window.hpp"
 #include "objects.hpp"
-#include "lista-encadeada.hpp"
-#include "elemento.hpp"
+#include "ListaEnc.hpp"
+#include "Elemento.hpp"
 
 class Viewport
 {
