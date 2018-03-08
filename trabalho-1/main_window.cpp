@@ -158,18 +158,17 @@ gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data)
   cairo_set_source_rgb (cr, 1, 0, 0);
   cairo_set_line_width(cr, 0.5);
 
-  //double width = gtk_widget_get_allocated_width (widget);
-  //double height = gtk_widget_get_allocated_height (widget);
-   
+  int width = gtk_widget_get_allocated_width (widget);
+  int height = gtk_widget_get_allocated_height (widget);
    //550x535
    //25+500+25
    //18+500+17
-  /*cairo_move_to(cr, 25, 18);
-  cairo_line_to(cr, 525, 18);
-  cairo_line_to(cr, 525, 517);
-  cairo_line_to(cr, 25, 517);
-  cairo_line_to(cr, 25, 18);
-  cairo_stroke(cr);*/
+  cairo_move_to(cr, 20, 20);
+  cairo_line_to(cr, width - 20, 20);
+  cairo_line_to(cr, width - 20, height - 20);
+  cairo_line_to(cr, 20, height - 20);
+  cairo_line_to(cr, 20, 20);
+  cairo_stroke(cr);
   
   viewport->drawDisplayFile(cr);
 

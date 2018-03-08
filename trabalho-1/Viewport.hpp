@@ -82,14 +82,7 @@ void Viewport::drawPolygon(Object* obj,cairo_t* cr) {
 	cairo_stroke(cr);
 }
 
-void Viewport::drawDisplayFile(cairo_t* cr){
-  cairo_move_to(cr, 25, 18);
-  cairo_line_to(cr, 525, 18);
-  cairo_line_to(cr, 525, 517);
-  cairo_line_to(cr, 25, 517);
-  cairo_line_to(cr, 25, 18);
-  cairo_stroke(cr);
-
+void Viewport::drawDisplayFile(cairo_t* cr) {
   //percorrer o displayfile enviando os objetos para o respectivo draw
   for (int i = 0; i < _objetos.tamanho(); ++i) {
     auto teste = _objetos.retornaDaPosicao(i);
