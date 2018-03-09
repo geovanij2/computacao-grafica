@@ -151,34 +151,28 @@ void on_add_poly_clicked (GtkWidget *widget, gpointer   data)
 
 gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) 
 {
-
-  cairo_set_source_rgb(cr, 1, 1, 1);   
+  cairo_set_source_rgb(cr, 1, 1, 1);
   cairo_paint(cr);
-
   cairo_set_source_rgb (cr, 1, 0, 0);
-  cairo_set_line_width(cr, 0.5);
+  cairo_set_line_width(cr, 5.0);
 
   int width = gtk_widget_get_allocated_width (widget);
   int height = gtk_widget_get_allocated_height (widget);
-   //550x535
-   //25+500+25
-   //18+500+17
-  cairo_move_to(cr, 20, 20);
-  cairo_line_to(cr, width - 20, 20);
-  cairo_line_to(cr, width - 20, height - 20);
-  cairo_line_to(cr, 20, height - 20);
-  cairo_line_to(cr, 20, 20);
+   //530x535
+  cairo_move_to(cr, 0, 0);
+  cairo_line_to(cr, width, 0);
+  cairo_line_to(cr, width, height);
+  cairo_line_to(cr, 0, height);
+  cairo_line_to(cr, 0, 0);
   cairo_stroke(cr);
   
+  cairo_set_source_rgb(cr, 0, 0, 0);   
+  cairo_set_line_width(cr, 1.0);
   viewport->drawDisplayFile(cr);
 
   cairo_set_source_rgb(cr, 0, 0, 0);
   cairo_set_line_width(cr, 1);
 
-
-    /*for(list<Element*>::iterator it = displayFile.begin(); it != displayFile.end(); it++) {
-        (*it)->draw(cr, adaptX, adaptY, window, type);
-    }*/
   gtk_widget_queue_draw(draw_viewport);
   return FALSE;
 }
@@ -223,7 +217,7 @@ int main (int   argc, char *argv[])
   gtk_window_set_resizable (GTK_WINDOW(main_w),  false);
 
   /* Tamanho da viewport */
-  viewport = new Viewport(550,535); 
+  viewport = new Viewport(530,535); 
   /* Connect Treeview*/
   objects_tree = GTK_TREE_VIEW(gtk_builder_get_object(builder, "object_tree"));
   create_treeview();
