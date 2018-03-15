@@ -6,42 +6,31 @@
 #include <stdexcept>
 #include <iostream>
 
-class Coordinate {
+class Coordinate: public <std::vector> {
 	public:
- 		Coordinate() :
- 			x(0),
- 			y(0)
- 		{}
+ 		Coordinate(int n) {
+ 			if (n < 2 || n > 3)
+ 				throw std::out_of_range("Coodinate must be 2 or 3 dimensional");
+ 			for (int i = 0; i < n; i++)
+ 				this->push_back(0);
+ 			this->push_back(1);
+ 		}
 
- 		Coordinate(double x, double y) :
- 			x(x),
- 			y(y)
- 		{}
+ 		Coordinate(double x, double y) {
+ 			this->push_back(x);
+ 			this->push_back(y);
+ 			this->push_back(1);
+ 		}
 
+ 		Coordinate(double x, double y, double z) {
+ 			this->push_back(x);
+ 			this->push_back(y);
+ 			this->push_back(z);
+ 			this->push_back(1);
+ 		}
+
+ 		Coordinate::operator+=(Coordinate&)
  		virtual ~Coordinate() {};
-
- 		Coordinate& operator+=(const Coordinate& other) {
- 			this->x += other.x;
- 			this->y += other.y;
- 			return *this;
- 		}
-
- 		Coordinate& operator-=(const Coordinate& other) {
- 			this->x -= other.x;
- 			this->y -= other.y;
- 			return *this;
- 		}
-
- 		bool operator==(const Coordinate& other) {
- 			return (this->x == other.x && this->y == other.y);
- 		}
-
- 		friend std::ostream& operator<<(std::ostream& os, const Coordinate& coord) {
- 			os << '(' << coord.x << ',' << coord.y << ')';
- 			return os;
- 		}
-
- 		double x, y;
  	protected:
  	private:
 };
@@ -108,6 +97,10 @@ class Object {
 	protected:
 		void add_coordinate(double x, double y) {
 			_coords.emplace_back(x,y);
+		}
+
+		void add_coordinate(double x , double y, double z) {
+			_coords.emplace_back(x,y,z);
 		}
 
 		void add_coordinate(const Coordinate& coord) {
