@@ -6,7 +6,7 @@
 #include <stdexcept>
 #include <iostream>
 
-class Coordinate: public <std::vector> {
+class Coordinate: public std::vector<double> {
 	public:
  		Coordinate(int n) {
  			if (n < 2 || n > 3)
@@ -29,7 +29,51 @@ class Coordinate: public <std::vector> {
  			this->push_back(1);
  		}
 
- 		Coordinate::operator+=(Coordinate&)
+ 		Coordinate& operator+=(const Coordinate& other) {
+ 			if (this->size() != other.size())
+ 				throw std::out_of_range("Different dimensions coodinates");
+            for (int i = 0; i < this->size()-1; ++i)
+                this->at(i) = this->at(i) + other[i];
+            return *this;
+ 		};
+ 		
+ 		friend Coordinate operator+(Coordinate lhs, const Coordinate& rhs) {
+ 			lhs += rhs;
+ 			return lhs;
+ 		};
+
+ 		Coordinate& operator-=(const Coordinate& other) {
+ 			if (this->size() != other.size())
+ 				throw std::out_of_range("Different dimensions coodinates");
+            for (int i = 0; i < this->size()-1; ++i)
+                this->at(i) = this->at(i) - other[i];
+            return *this;
+ 		};
+ 		
+ 		friend Coordinate operator-(Coordinate lhs, const Coordinate& rhs) {
+ 			lhs -= rhs;
+ 			return lhs;
+ 		};
+
+		bool operator==(const Coordinate& other) {
+			if (this->size() != other.size())
+				return false;
+			for (int i = 0; i < this->size(); ++i) {
+				if (this->at(i) != other[i])
+					return false;
+			}
+			return true;
+		};
+
+		friend std::ostream& operator<<(std::ostream& os, const Coordinate& coord) {
+			os << '[';
+			int i;
+			for (i = 0; i < coord.size()-1; ++i)
+				os << coord[i] << ',';
+			os << coord[i] << ']';
+			return os;
+		};
+
  		virtual ~Coordinate() {};
  	protected:
  	private:

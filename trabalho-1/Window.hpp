@@ -17,7 +17,7 @@ class Window
        Coordinate lowmin() const { return _lowmin; }
        Coordinate uppermax() const { return _uppermax; }
        void printteste(){
-        printf("%f\n", _lowmin.x);
+        printf("%f\n", _lowmin[0]);
        }
 
   protected:
