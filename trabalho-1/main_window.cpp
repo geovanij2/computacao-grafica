@@ -79,6 +79,7 @@ GtkButton* angle_obj_button;
 GtkButton* translate_button;
 GtkButton* rotate_point_button;
 GtkButton* schedule_button;
+GtkButton* change_obj_button;
 
 void fill_treeview(const char* name,const char* type);
 std::string get_name_selected();
@@ -122,6 +123,8 @@ void on_add_object_button_clicked (GtkWidget *widget, gpointer   data)
 }
 void on_change_object_clicked (GtkWidget *widget, gpointer   data)
 {
+  //esse metodo deve instanciar uma matriz em que será acumulada as transformações
+  //cada botão adicionará a sua matriz na matriz atual acumulando as transformações
   GtkTreeIter iter;
   GtkTreeModel *model;
   if(gtk_tree_selection_get_selected (objects_select, &model, &iter)) {
@@ -189,32 +192,38 @@ void on_add_poly_clicked (GtkWidget *widget, gpointer   data)
 /* Buttons Change object */
 void on_angle_world_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  std::string name = get_name_selected();
   double angle = atof(gtk_entry_get_text(angle_world_entry));
+  //acumula a matriz de rotação no centro do mundo na matriz atual
 }
 void on_angle_obj_button_clicked(GtkWidget *widget, gpointer   data)
 {
   std::string name = get_name_selected();
   double angle = atof(gtk_entry_get_text(angle_obj_entry));
+  //acumula a matriz de rotação no objeto na matriz atual
 }
 void on_translate_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  std::string name = get_name_selected();
   double dx = atof(gtk_entry_get_text(trans_x_entry));
   double dy = atof(gtk_entry_get_text(trans_y_entry));
+  //acumula a matriz de translação na matriz atual
 }
 void on_rotate_point_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  std::string name = get_name_selected();
   double angle = atof(gtk_entry_get_text(angle_point_entry));
   double x = atof(gtk_entry_get_text(angle_pointx_entry));
   double y = atof(gtk_entry_get_text(angle_pointy_entry));
+  //acumula a matriz de rotação na matriz atual
 }
 void on_schedule_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  std::string name = get_name_selected();
   double sx = atof(gtk_entry_get_text(sx_entry));
   double sy = atof(gtk_entry_get_text(sy_entry));
+  //acumula a matriz de escalonamento na matriz atual
+}
+void on_change_obj_button_clicked (GtkWidget *widget, gpointer   data)
+{
+  std::string name = get_name_selected();
+  //aqui será onde será feita a multiplicação da matriz final no objeto com nome name
 }
 
 gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) 
@@ -391,6 +400,9 @@ int main (int   argc, char *argv[])
 
   schedule_button = GTK_BUTTON(gtk_builder_get_object(builder, "schedule_button"));
   g_signal_connect (schedule_button, "clicked", G_CALLBACK (on_schedule_button_clicked), NULL);
+
+  change_obj_button = GTK_BUTTON(gtk_builder_get_object(builder, "change_obj_button"));
+  g_signal_connect (change_obj_button, "clicked", G_CALLBACK (on_change_obj_button_clicked), NULL);
 
 /* Connecting Entry*/
   step_entry = GTK_ENTRY(gtk_builder_get_object(builder, "step_entry"));
