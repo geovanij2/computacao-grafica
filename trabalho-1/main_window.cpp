@@ -1,7 +1,9 @@
+#include <iostream>
 #include <gtk/gtk.h>
 #include <stdlib.h>  
 #include "Viewport.hpp"
 #include "objects.hpp"
+
 
 //Objetos da main window
 Viewport* viewport;
@@ -12,6 +14,7 @@ GtkListStore  *store;
 GtkTreeIter iter;
 GtkTreeView* objects_tree;
 GtkWidget *view;
+GtkTreeSelection* objects_select;
 
 GtkWidget* draw_viewport;
 GtkButton* zoom_in;
@@ -21,6 +24,8 @@ GtkButton* move_up;
 GtkButton* move_right;
 GtkButton* move_left;
 GtkButton* add_geometric_shape;
+GtkButton* change_object;
+GtkEntry* step_entry;
 
 //Enum para TreeView
 enum
@@ -57,41 +62,73 @@ GtkEntry* x_poly_entry;
 GtkEntry* y_poly_entry;
 GtkButton* add_point_poly;
 GtkButton* add_poly;
-GtkToggleButton *filled;
+
+//Objects from change_obj_w
+GObject* change_obj_w;
+GtkEntry* angle_world_entry;
+GtkEntry* angle_obj_entry;
+GtkEntry* trans_y_entry;
+GtkEntry* trans_x_entry;
+GtkEntry* angle_point_entry;
+GtkEntry* angle_pointx_entry;
+GtkEntry* angle_pointy_entry;
+GtkEntry* sx_entry;
+GtkEntry* sy_entry;
+GtkButton* angle_world_button;
+GtkButton* angle_obj_button;
+GtkButton* translate_button;
+GtkButton* rotate_point_button;
+GtkButton* schedule_button;
 
 void fill_treeview(const char* name,const char* type);
+std::string get_name_selected();
 
 /* CALLBACKS */
 
 /* MAIN_W */
 void on_zoom_in_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  viewport->zoom(10);
+  double step = atof(gtk_entry_get_text(step_entry));
+  viewport->zoom(step);
 }
 void on_zoom_out_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  viewport->zoom(-10);
+  double step = atof(gtk_entry_get_text(step_entry));
+  viewport->zoom(-step);
 }
 void on_up_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  viewport->moveY(10);
+  double step = atof(gtk_entry_get_text(step_entry));
+  viewport->moveY(step);
 }
 void on_down_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  viewport->moveY(-10);
+  double step = atof(gtk_entry_get_text(step_entry));
+  viewport->moveY(-step);
 }
 void on_left_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  viewport->moveX(-10);
+  double step = atof(gtk_entry_get_text(step_entry));
+  viewport->moveX(-step);
 }
 void on_right_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  viewport->moveX(10); 
+  double step = atof(gtk_entry_get_text(step_entry));
+  viewport->moveX(step); 
 }
 void on_add_object_button_clicked (GtkWidget *widget, gpointer   data)
 {
   gtk_widget_show (GTK_WIDGET(add_geometric_shape_w));
 }
+void on_change_object_clicked (GtkWidget *widget, gpointer   data)
+{
+  GtkTreeIter iter;
+  GtkTreeModel *model;
+  if(gtk_tree_selection_get_selected (objects_select, &model, &iter)) {
+    gtk_widget_show (GTK_WIDGET(change_obj_w));
+  }
+}
+
 /* ADD_GEOMETRIC_W */
 void on_add_point1_clicked (GtkWidget *widget, gpointer   data)
 {
@@ -149,6 +186,37 @@ void on_add_poly_clicked (GtkWidget *widget, gpointer   data)
   polygon_coords.clear();
 }
 
+/* Buttons Change object */
+void on_angle_world_button_clicked (GtkWidget *widget, gpointer   data)
+{
+  std::string name = get_name_selected();
+  double angle = atof(gtk_entry_get_text(angle_world_entry));
+}
+void on_angle_obj_button_clicked(GtkWidget *widget, gpointer   data)
+{
+  std::string name = get_name_selected();
+  double angle = atof(gtk_entry_get_text(angle_obj_entry));
+}
+void on_translate_button_clicked (GtkWidget *widget, gpointer   data)
+{
+  std::string name = get_name_selected();
+  double dx = atof(gtk_entry_get_text(trans_x_entry));
+  double dy = atof(gtk_entry_get_text(trans_y_entry));
+}
+void on_rotate_point_button_clicked (GtkWidget *widget, gpointer   data)
+{
+  std::string name = get_name_selected();
+  double angle = atof(gtk_entry_get_text(angle_point_entry));
+  double x = atof(gtk_entry_get_text(angle_pointx_entry));
+  double y = atof(gtk_entry_get_text(angle_pointy_entry));
+}
+void on_schedule_button_clicked (GtkWidget *widget, gpointer   data)
+{
+  std::string name = get_name_selected();
+  double sx = atof(gtk_entry_get_text(sx_entry));
+  double sy = atof(gtk_entry_get_text(sy_entry));
+}
+
 gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) 
 {
   cairo_set_source_rgb(cr, 1, 1, 1);
@@ -177,6 +245,19 @@ gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data)
   return FALSE;
 }
 
+std::string get_name_selected()
+{
+  GtkTreeIter iter;
+  GtkTreeModel *model;
+  gchar* object_name;
+  std::string name;
+
+  if(gtk_tree_selection_get_selected (objects_select, &model, &iter)) {
+    gtk_tree_model_get (model, &iter, COL_NAME, &object_name, -1);
+    name = (std::string)object_name;
+  }
+  return name;
+}
 
 void fill_treeview (const char* name, const char* type)
 {
@@ -198,6 +279,9 @@ void create_treeview (void)
 
   model = GTK_TREE_MODEL (store = gtk_list_store_new (NUM_COLS, G_TYPE_STRING, G_TYPE_STRING));
   gtk_tree_view_set_model (GTK_TREE_VIEW (objects_tree), model);
+
+  objects_select = gtk_tree_view_get_selection(objects_tree);
+  gtk_tree_selection_set_mode(objects_select, GTK_SELECTION_SINGLE);
 
   g_object_unref (model);
 }
@@ -221,6 +305,7 @@ int main (int   argc, char *argv[])
   /* Connect Treeview*/
   objects_tree = GTK_TREE_VIEW(gtk_builder_get_object(builder, "object_tree"));
   create_treeview();
+
 
   draw_viewport = GTK_WIDGET(gtk_builder_get_object(builder, "draw_viewport"));
   g_signal_connect(draw_viewport, "draw", G_CALLBACK(draw_objects), NULL);
@@ -246,6 +331,9 @@ int main (int   argc, char *argv[])
 
   add_geometric_shape = GTK_BUTTON(gtk_builder_get_object(builder, "add_geometric_shape"));
   g_signal_connect (add_geometric_shape, "clicked", G_CALLBACK (on_add_object_button_clicked), NULL);
+
+  change_object = GTK_BUTTON(gtk_builder_get_object(builder, "change_object"));
+  g_signal_connect (change_object, "clicked", G_CALLBACK (on_change_object_clicked), NULL);
 
 
   /* Buttons add_geometric_shape_w, just open a new window*/
@@ -285,7 +373,27 @@ int main (int   argc, char *argv[])
   add_poly = GTK_BUTTON(gtk_builder_get_object(builder, "add_poly"));
   g_signal_connect (add_poly, "clicked", G_CALLBACK (on_add_poly_clicked), NULL);
 
+/* Buttons Change object */
+  change_obj_w = gtk_builder_get_object (builder, "change_obj_w");
+  g_signal_connect (change_obj_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
+
+  angle_world_button = GTK_BUTTON(gtk_builder_get_object(builder, "angle_world_button"));
+  g_signal_connect (angle_world_button  , "clicked", G_CALLBACK (on_angle_world_button_clicked), NULL);
+
+  angle_obj_button = GTK_BUTTON(gtk_builder_get_object(builder, "angle_obj_button"));
+  g_signal_connect (angle_obj_button, "clicked", G_CALLBACK (on_angle_obj_button_clicked), NULL);
+
+  translate_button = GTK_BUTTON(gtk_builder_get_object(builder, "translate_button"));
+  g_signal_connect (translate_button, "clicked", G_CALLBACK (on_translate_button_clicked), NULL);
+
+  rotate_point_button = GTK_BUTTON(gtk_builder_get_object(builder, "rotate_point_button"));
+  g_signal_connect (rotate_point_button, "clicked", G_CALLBACK (on_rotate_point_button_clicked), NULL);
+
+  schedule_button = GTK_BUTTON(gtk_builder_get_object(builder, "schedule_button"));
+  g_signal_connect (schedule_button, "clicked", G_CALLBACK (on_schedule_button_clicked), NULL);
+
 /* Connecting Entry*/
+  step_entry = GTK_ENTRY(gtk_builder_get_object(builder, "step_entry"));
   name_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_point_entry"));
   x1_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "x1_point_entry"));
   y1_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "y1_point_entry"));
@@ -297,6 +405,16 @@ int main (int   argc, char *argv[])
   name_poly_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_poly_entry"));
   x_poly_entry = GTK_ENTRY(gtk_builder_get_object(builder, "x_poly_entry"));
   y_poly_entry = GTK_ENTRY(gtk_builder_get_object(builder, "y_poly_entry"));
+  angle_world_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_world_entry"));
+  angle_obj_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_obj_entry"));
+  trans_x_entry = GTK_ENTRY(gtk_builder_get_object(builder, "trans_x_entry"));
+  trans_y_entry = GTK_ENTRY(gtk_builder_get_object(builder, "trans_y_entry"));
+  angle_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_point_entry"));
+  angle_pointx_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_pointx_entry"));
+  angle_pointy_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_pointy_entry"));
+  sx_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sx_entry"));
+  sy_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sy_entry"));
+
 
   gtk_widget_show(GTK_WIDGET(main_w));
 
