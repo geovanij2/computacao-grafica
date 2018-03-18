@@ -5,6 +5,7 @@
 #include <vector>
 #include <stdexcept>
 #include <iostream>
+#include "Transformation.hpp"
 
 class Coordinate: public std::vector<double> {
 	public:
@@ -27,6 +28,22 @@ class Coordinate: public std::vector<double> {
  			this->push_back(y);
  			this->push_back(z);
  			this->push_back(1);
+ 		}
+
+ 		void transform(Matrix& m) {
+ 			if (m.size() != this->size()) {
+ 				throw "dimensional error";
+ 			}
+ 			std::vector<double> res;
+ 			for (int i = 0; i < this->size(); ++i) {
+ 				double sum = 0;
+ 				for (int j = 0; j < m.size(); ++j) {
+ 					sum += this->at(i) * m[j][i];
+ 				}
+ 				res.push_back(sum);
+ 			}
+ 			for (int i = 0; i < res.size(); ++i)
+ 				this->at(i) = res[i];
  		}
 
  		Coordinate& operator+=(const Coordinate& other) {
@@ -128,6 +145,13 @@ class Object {
 
 		Object& operator*() {
 			return *this;
+		}
+
+		void transform_coords(const Transformation& t) {
+			Matrix m = t.get_transformation_matrix();
+			for (int i = 0; i < _coords.size(); i++) {
+				_coords[i].transform(m);
+			}
 		}
 
 		friend std::ostream& operator<<(std::ostream& os, const Object& obj) {
