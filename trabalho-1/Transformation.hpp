@@ -86,7 +86,7 @@ class Transformation {
 		};
 
 		static Transformation generate_2D_rotation_matrix(double degrees) {
-			double rad = to_radians(degrees);
+			double rad = -to_radians(degrees);
 
 			Matrix m = { {cos(rad), -sin(rad), 0},
 						 {sin(rad), cos(rad), 0},
