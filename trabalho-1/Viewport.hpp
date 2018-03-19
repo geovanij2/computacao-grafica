@@ -18,7 +18,7 @@ class Viewport
     void moveY(double value);
     void drawDisplayFile(cairo_t* cr);
     void addObject(Object* obj) { _objetos.adiciona(obj); };
-
+    Object* getObject(int index) { _objetos.retornaDaPosicao(index);};
     Coordinate transformOneCoordinate(const Coordinate& c) const;
     Coordinates transformOneCoordinates(const Coordinates& coords) const;
   protected:

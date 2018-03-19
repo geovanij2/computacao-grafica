@@ -1,13 +1,15 @@
 #include <iostream>
 #include <gtk/gtk.h>
+#include <stdio.h>
 #include <stdlib.h>  
 #include "Viewport.hpp"
 #include "objects.hpp"
-
+#include "Transformation.hpp"
 
 //Objetos da main window
 Viewport* viewport;
 Coordinates polygon_coords;
+std::vector<Transformation> accumulator;
 
 GObject *main_w;
 GtkListStore  *store;
@@ -30,10 +32,13 @@ GtkEntry* step_entry;
 //Enum para TreeView
 enum
 {
-  COL_NAME = 0,
+  COL_ID = 0,
+  COL_NAME,
   COL_TYPE,
   NUM_COLS
 } ;
+
+int count_obj = 0;
 
 //Objetos da janela de adicionar forma geometrica
 GObject* add_geometric_shape_w;
@@ -82,7 +87,7 @@ GtkButton* schedule_button;
 GtkButton* change_obj_button;
 
 void fill_treeview(const char* name,const char* type);
-std::string get_name_selected();
+int get_index_selected();
 
 /* CALLBACKS */
 
@@ -153,7 +158,6 @@ void on_add_point_clicked (GtkWidget *widget, gpointer   data)
   double y1 = atof(gtk_entry_get_text(y1_point_entry));
  
   fill_treeview(name,"Point");
-
   Point* point = new Point(name, x1, y1);
   viewport->addObject(point);
 }
@@ -193,37 +197,54 @@ void on_add_poly_clicked (GtkWidget *widget, gpointer   data)
 void on_angle_world_button_clicked (GtkWidget *widget, gpointer   data)
 {
   double angle = atof(gtk_entry_get_text(angle_world_entry));
-  //acumula a matriz de rotação no centro do mundo na matriz atual
+  accumulator.push_back(Transformation::generate_2D_rotation_around_point(angle, Coordinate(0,0))); 
 }
 void on_angle_obj_button_clicked(GtkWidget *widget, gpointer   data)
 {
-  std::string name = get_name_selected();
+  int index = get_index_selected();
+  Coordinate center = (viewport->getObject(index))->get_center_coord();
+
   double angle = atof(gtk_entry_get_text(angle_obj_entry));
-  //acumula a matriz de rotação no objeto na matriz atual
+  accumulator.push_back(Transformation::generate_2D_rotation_around_point(angle, center));
+
 }
 void on_translate_button_clicked (GtkWidget *widget, gpointer   data)
 {
   double dx = atof(gtk_entry_get_text(trans_x_entry));
   double dy = atof(gtk_entry_get_text(trans_y_entry));
-  //acumula a matriz de translação na matriz atual
+  accumulator.push_back(Transformation::generate_2D_translation_matrix(dx, dy));
+
 }
 void on_rotate_point_button_clicked (GtkWidget *widget, gpointer   data)
 {
   double angle = atof(gtk_entry_get_text(angle_point_entry));
   double x = atof(gtk_entry_get_text(angle_pointx_entry));
   double y = atof(gtk_entry_get_text(angle_pointy_entry));
-  //acumula a matriz de rotação na matriz atual
+  accumulator.push_back(Transformation::generate_2D_rotation_around_point(angle, Coordinate(x,y)));
+
 }
 void on_schedule_button_clicked (GtkWidget *widget, gpointer   data)
 {
   double sx = atof(gtk_entry_get_text(sx_entry));
   double sy = atof(gtk_entry_get_text(sy_entry));
-  //acumula a matriz de escalonamento na matriz atual
+
+  int index = get_index_selected();
+  Coordinate center = (viewport->getObject(index))->get_center_coord();
+  accumulator.push_back(Transformation::generate_2D_scaling_around_obj_center_matrix(sx, sy, center));
 }
 void on_change_obj_button_clicked (GtkWidget *widget, gpointer   data)
 {
-  std::string name = get_name_selected();
+  //std::string name = get_name_selected();
   //aqui será onde será feita a multiplicação da matriz final no objeto com nome name
+  Matrix identity = { {1, 0, 0},
+             {0, 1, 0},
+             {0, 0, 1} };
+  Transformation id = Transformation(identity);
+  for(int i=0; i < accumulator.size(); i++){
+    id *= accumulator.at(i);
+  }
+  viewport->getObject(get_index_selected())->transform_coords(id);
+  accumulator.clear();
 }
 
 gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) 
@@ -254,24 +275,23 @@ gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data)
   return FALSE;
 }
 
-std::string get_name_selected()
+int get_index_selected()
 {
   GtkTreeIter iter;
   GtkTreeModel *model;
-  gchar* object_name;
-  std::string name;
+  int index;
 
   if(gtk_tree_selection_get_selected (objects_select, &model, &iter)) {
-    gtk_tree_model_get (model, &iter, COL_NAME, &object_name, -1);
-    name = (std::string)object_name;
+    gtk_tree_model_get (model, &iter, COL_ID, &index, -1);
   }
-  return name;
+  return index;
 }
 
 void fill_treeview (const char* name, const char* type)
 {
   gtk_list_store_append (store, &iter);
-  gtk_list_store_set (store, &iter, COL_NAME, name, COL_TYPE, type,-1);
+  gtk_list_store_set (store, &iter, COL_ID, count_obj, COL_NAME, name, COL_TYPE, type,-1);
+  count_obj++;
 }
 
 void create_treeview (void)
@@ -281,12 +301,16 @@ void create_treeview (void)
 
   /* Column 1 */
   renderer = gtk_cell_renderer_text_new ();
+  gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (objects_tree), -1, "ID", renderer, "text", COL_ID, NULL);
+
+  renderer = gtk_cell_renderer_text_new ();
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (objects_tree), -1, "Name", renderer, "text", COL_NAME, NULL);
   /* Column 2 */
   renderer = gtk_cell_renderer_text_new ();
   gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW (objects_tree), -1, "Type", renderer, "text", COL_TYPE, NULL);
 
-  model = GTK_TREE_MODEL (store = gtk_list_store_new (NUM_COLS, G_TYPE_STRING, G_TYPE_STRING));
+
+  model = GTK_TREE_MODEL (store = gtk_list_store_new (NUM_COLS, G_TYPE_UINT, G_TYPE_STRING, G_TYPE_STRING));
   gtk_tree_view_set_model (GTK_TREE_VIEW (objects_tree), model);
 
   objects_select = gtk_tree_view_get_selection(objects_tree);
