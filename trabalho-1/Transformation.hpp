@@ -1,12 +1,10 @@
 #ifndef TRANSFORMATION_H
 #define TRANSFORMATION_H
 
-#include "objects.hpp"
+#include "coordinate.hpp"
 #include <cmath>
 
 #define PI 3.1415926535897932384626433832795
-
-typedef std::vector<std::vector<double>> Matrix;
 
 class Transformation {
 	public:
