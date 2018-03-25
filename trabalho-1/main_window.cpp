@@ -128,12 +128,12 @@ void on_right_button_clicked (GtkWidget *widget, gpointer   data)
 void on_rotate_right_clicked (GtkWidget *widget, gpointer data)
 {
   double angle = atof(gtk_entry_get_text(angle_entry));
-  viewport->rotate_window(angle);
+  viewport->rotate_window(-angle);
 }
 void on_rotate_left_clicked (GtkWidget *widget, gpointer data)
 {
   double angle = atof(gtk_entry_get_text(angle_entry));
-  viewport->rotate_window(-angle);
+  viewport->rotate_window(angle);
 }
 void on_add_object_button_clicked (GtkWidget *widget, gpointer   data)
 {

@@ -72,7 +72,7 @@ void Window::update_transformation() {
 						  {0, 1, 0},
 						  {0, 0, 1} });
 	_t *= Transformation::generate_2D_translation_matrix(-_center[0], -_center[1]);
-	_t *= Transformation::generate_2D_rotation_matrix(_angle);
+	_t *= Transformation::generate_2D_rotation_matrix(-_angle);
 	_t *= Transformation::generate_2D_scaling_matrix(1/(_width/2), 1/(_heigth/2));
 }
 
