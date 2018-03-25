@@ -1,6 +1,8 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
+
+#include <cmath>
 #include "coordinate.hpp"
 #include "Transformation.hpp"
 
@@ -47,14 +49,16 @@ void Window::zoom(double step) {
 
 /* Move Window Horizontally */
 void Window::moveX(double value) {
-	Coordinate coord(value, 0);
+	double teta = Transformation::to_radians(_angle);
+	Coordinate coord(cos(teta)*value, -sin(teta)*value);
 
 	_center += coord;
 }
 
 /* Move Window Vertically */
 void Window::moveY(double value) {
-	Coordinate coord(0, value);
+	double teta = Transformation::to_radians(_angle);
+	Coordinate coord(sin(teta)*value, cos(teta)*value);
 
 	_center += coord;
 }
