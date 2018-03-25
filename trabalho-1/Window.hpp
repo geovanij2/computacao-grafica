@@ -57,9 +57,6 @@ void Window::zoom(double step) {
 	_uppermax -= coord_e;
 	_lowmax -= coord_d;
 	_uppermin += coord_d;
-
-	_width_scale -= step;
-	_heigth_scale -= step;
 }
 
 /* Move Window Horizontally */
@@ -90,9 +87,9 @@ void Window::update_transformation() {
 	_t = Transformation({ {1, 0, 0},
 						  {0, 1, 0},
 						  {0, 0, 1} });
-	_t *= Transformation::generate_2D_translation_matrix(_center[0], _center[1]);
+	_t *= Transformation::generate_2D_translation_matrix(-_center[0], -_center[1]);
 	_t *= Transformation::generate_2D_rotation_matrix(_angle);
-	_t *= Transformation::generate_2D_scaling_matrix(_width_scale, _heigth_scale);
+	_t *= Transformation::generate_2D_scaling_matrix(1/_center[0], 1/_center[1]);
 }
 
 #endif

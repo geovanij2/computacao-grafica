@@ -44,11 +44,11 @@ class Object {
 		}
 
 		Coordinates& get_normalized_coords() {
-			return _coords;
+			return _normalized_coords;
 		}
 
 		const Coordinates& get_normalized_coords() const {
-			return _coords;
+			return _normalized_coords;
 		}
 
 		Coordinate& get_coord_at_index(int index) {

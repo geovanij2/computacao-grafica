@@ -22,7 +22,7 @@ class Viewport
     void moveX(double value);
     void moveY(double value);
     void drawDisplayFile(cairo_t* cr);
-    void addObject(Object* obj) { _objetos.adiciona(obj); };
+    void addObject(Object* obj) { _objetos.adiciona(obj); normalize_obj(obj); };
     Object* getObject(int index) { _objetos.retornaDaPosicao(index);};
     Coordinate transformOneCoordinate(const Coordinate& c) const;
     Coordinates transformOneCoordinates(const Coordinates& coords) const;
@@ -43,15 +43,15 @@ class Viewport
 
 void Viewport::zoom(double step){
   _window->zoom(step);
-  tranform_all_objs();
+  normalize_all_objs();
 }
 void Viewport::moveX(double step){
   _window->moveX(step);
-  tranform_all_objs();
+  normalize_all_objs();
 }
 void Viewport::moveY(double step){
   _window->moveY(step);
-  tranform_all_objs();
+  normalize_all_objs();
 }
 
 void Viewport::normalize_obj(Object* obj) {
