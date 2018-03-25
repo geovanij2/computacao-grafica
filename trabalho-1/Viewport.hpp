@@ -33,7 +33,7 @@ class Viewport
     ListaEnc<Object*> _objetos;
 
     void normalize_all_objs();
-    void normalize_obj();
+    void normalize_obj(Object* obj);
 
 	  void drawPoint(Object* objeto, cairo_t* cr);
     void drawLine(Object* objeto, cairo_t* cr);
