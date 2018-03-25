@@ -27,14 +27,14 @@ class Viewport
     Object* getObject(int index) { _objetos.retornaDaPosicao(index);};
     Coordinate transformOneCoordinate(const Coordinate& c) const;
     Coordinates transformOneCoordinates(const Coordinates& coords) const;
+    void normalize_obj(Object* obj);
   protected:
   private:
     Window* _window;
-  	double _width, _height;
+    double _width, _height;
     ListaEnc<Object*> _objetos;
 
     void normalize_all_objs();
-    void normalize_obj(Object* obj);
 
 	  void drawPoint(Object* objeto, cairo_t* cr);
     void drawLine(Object* objeto, cairo_t* cr);

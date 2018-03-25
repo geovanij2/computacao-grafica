@@ -27,7 +27,10 @@ GtkButton* move_right;
 GtkButton* move_left;
 GtkButton* add_geometric_shape;
 GtkButton* change_object;
+GtkButton* rotate_left;
+GtkButton* rotate_right;
 GtkEntry* step_entry;
+GtkEntry* angle_entry;
 
 //Enum para TreeView
 enum
@@ -121,6 +124,16 @@ void on_right_button_clicked (GtkWidget *widget, gpointer   data)
 {
   double step = atof(gtk_entry_get_text(step_entry));
   viewport->moveX(step); 
+}
+void on_rotate_right_clicked (GtkWidget *widget, gpointer data)
+{
+  double angle = atof(gtk_entry_get_text(angle_entry));
+  viewport->rotate_window(angle);
+}
+void on_rotate_left_clicked (GtkWidget *widget, gpointer data)
+{
+  double angle = atof(gtk_entry_get_text(angle_entry));
+  viewport->rotate_window(-angle);
 }
 void on_add_object_button_clicked (GtkWidget *widget, gpointer   data)
 {
@@ -243,7 +256,9 @@ void on_change_obj_button_clicked (GtkWidget *widget, gpointer   data)
   for(int i=0; i < accumulator.size(); i++){
     id *= accumulator.at(i);
   }
-  viewport->getObject(get_index_selected())->transform_coords(id);
+  Object* obj = viewport->getObject(get_index_selected());
+  obj->transform_coords(id);
+  viewport->normalize_obj(obj);
   accumulator.clear();
 }
 
@@ -368,6 +383,11 @@ int main (int   argc, char *argv[])
   change_object = GTK_BUTTON(gtk_builder_get_object(builder, "change_object"));
   g_signal_connect (change_object, "clicked", G_CALLBACK (on_change_object_clicked), NULL);
 
+  rotate_right = GTK_BUTTON(gtk_builder_get_object(builder, "rotate_right"));
+  g_signal_connect (rotate_right, "clicked", G_CALLBACK (on_rotate_right_clicked), NULL);
+
+  rotate_left = GTK_BUTTON(gtk_builder_get_object(builder, "rotate_left"));
+  g_signal_connect (rotate_left, "clicked", G_CALLBACK (on_rotate_left_clicked), NULL);
 
   /* Buttons add_geometric_shape_w, just open a new window*/
   add_geometric_shape_w = gtk_builder_get_object (builder, "add_geometric_shape_w");
@@ -430,6 +450,7 @@ int main (int   argc, char *argv[])
 
 /* Connecting Entry*/
   step_entry = GTK_ENTRY(gtk_builder_get_object(builder, "step_entry"));
+  angle_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_entry"));
   name_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_point_entry"));
   x1_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "x1_point_entry"));
   y1_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "y1_point_entry"));
