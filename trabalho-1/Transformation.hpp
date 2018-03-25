@@ -36,6 +36,26 @@ class Transformation {
 			return generate_2D_translation_matrix(-coord[0], -coord[1]) * generate_2D_rotation_matrix(degrees) * generate_2D_translation_matrix(coord[0], coord[1]);
 		};
 
+		static double to_radians(double degrees) {
+			return (PI/180) * degrees;
+		};
+
+		static Transformation generate_2D_scaling_matrix(double sx, double sy) {
+			Matrix m = { {sx, 0, 0},
+						 {0, sy, 0},
+						 {0, 0, 1} };
+			return Transformation(m);
+		};
+
+		static Transformation generate_2D_rotation_matrix(double degrees) {
+			double rad = -to_radians(degrees);
+
+			Matrix m = { {cos(rad), -sin(rad), 0},
+						 {sin(rad), cos(rad), 0},
+						 {0, 0, 1} };
+			return Transformation(m);
+		};
+
 		Transformation& operator*=(const Transformation& other) {
 			Matrix m1 = this->_m;
 			const Matrix &m2 = other.get_transformation_matrix();
@@ -70,29 +90,11 @@ class Transformation {
     		}
     		return os;
 		};
+
+
 	protected:
 	private:
 		Matrix _m;
-
-		static double to_radians(double degrees) {
-			return (PI/180) * degrees;
-		};
-
-		static Transformation generate_2D_scaling_matrix(double sx, double sy) {
-			Matrix m = { {sx, 0, 0},
-						 {0, sy, 0},
-						 {0, 0, 1} };
-			return Transformation(m);
-		};
-
-		static Transformation generate_2D_rotation_matrix(double degrees) {
-			double rad = -to_radians(degrees);
-
-			Matrix m = { {cos(rad), -sin(rad), 0},
-						 {sin(rad), cos(rad), 0},
-						 {0, 0, 1} };
-			return Transformation(m);
-		}
 };
 
 #endif

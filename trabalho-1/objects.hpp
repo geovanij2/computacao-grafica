@@ -43,11 +43,27 @@ class Object {
 			return _coords;
 		}
 
+		Coordinates& get_normalized_coords() {
+			return _coords;
+		}
+
+		const Coordinates& get_normalized_coords() const {
+			return _coords;
+		}
+
 		Coordinate& get_coord_at_index(int index) {
 			return _coords[index];
 		}
 
 		const Coordinate& get_coord_at_index(int index) const {
+			return _coords[index];
+		}
+
+		Coordinate& get_normalized_coord_at_index(int index) {
+			return _coords[index];
+		}
+
+		const Coordinate& get_normalized_coord_at_index(int index) const {
 			return _coords[index];
 		}
 
@@ -58,6 +74,16 @@ class Object {
 				sum += _coords[i];
 			for (int i = 0; i < sum.size()-1; i++)
 				sum[i] /= _coords.size();
+			return sum;
+		}
+
+		Coordinate get_normalized_center_coord() {
+			int dim = _normalized_coords[0].size()-1;
+			Coordinate sum(dim);
+			for (int i = 0; i < _normalized_coords.size(); i++)
+				sum += _normalized_coords[i];
+			for (int i = 0; i < sum.size()-1; i++)
+				sum[i] /= _normalized_coords.size();
 			return sum;
 		}
 
@@ -73,6 +99,17 @@ class Object {
 			Matrix m = t.get_transformation_matrix();
 			for (int i = 0; i < _coords.size(); i++) {
 				_coords[i].transform(m);
+			}
+		}
+
+		void set_normalized_coords(const Transformation& t) {
+			if (_normalized_coords.size() > 0)
+				_normalized_coords.clear();
+			Matrix m = t.get_transformation_matrix();
+			for (int i = 0; i < _coords.size(); i++) {
+				Coordinate normalized_coord = _coords[i];
+				normalized_coord.transform(m);
+				_normalized_coords.push_back(normalized_coord);
 			}
 		}
 
@@ -103,6 +140,7 @@ class Object {
 	private:
 		const std::string _name;
 		Coordinates _coords;
+		Coordinates _normalized_coords;
 };
 
 class Point : public Object {

@@ -10,7 +10,12 @@ class Viewport
 {
   public:
   	Viewport(double width, double height):
-            _width(width), _height(height), _window(new Window(width,height)){}
+            _width(width),
+            _height(height),
+            _window(new Window(width,height))
+    { 
+      normalize_all_objs();
+    }
 
     virtual ~Viewport() {}
     void zoom(double step);
@@ -27,7 +32,10 @@ class Viewport
   	double _width, _height;
     ListaEnc<Object*> _objetos;
 
-	void drawPoint(Object* objeto, cairo_t* cr);
+    void normalize_all_objs();
+    void normalize_obj();
+
+	  void drawPoint(Object* objeto, cairo_t* cr);
     void drawLine(Object* objeto, cairo_t* cr);
     void drawPolygon(Object* objeto, cairo_t* cr);
 
@@ -35,12 +43,30 @@ class Viewport
 
 void Viewport::zoom(double step){
   _window->zoom(step);
+  tranform_all_objs();
 }
 void Viewport::moveX(double step){
   _window->moveX(step);
+  tranform_all_objs();
 }
 void Viewport::moveY(double step){
   _window->moveY(step);
+  tranform_all_objs();
+}
+
+void Viewport::normalize_obj(Object* obj) {
+  Transformation t = _window->get_transformation();
+  obj->set_normalized_coords(t);
+}
+
+void Viewport::normalize_all_objs() {
+  _window->update_transformation();
+  auto t = _window->get_transformation();
+
+  for (int i = 0; i < _objetos.tamanho(); i++) {
+    Object* obj = _objetos.retornaDaPosicao(i);
+    obj->set_normalized_coords(t);
+  }
 }
 
 Coordinate Viewport::transformOneCoordinate(const Coordinate& coord) const {
@@ -60,7 +86,7 @@ Coordinates Viewport::transformOneCoordinates(const Coordinates& coords) const {
 }
 
 void Viewport::drawPoint(Object* objeto, cairo_t* cr){
-    Coordinate coord = transformOneCoordinate(objeto->get_coord_at_index(0));
+    Coordinate coord = transformOneCoordinate(objeto->get_normalized_coord_at_index(0));
     //prepareContext();
     cairo_move_to(cr, coord[0], coord[1]);
     cairo_arc(cr, coord[0], coord[1], 1.0, 0.0, (2*G_PI) );
@@ -68,13 +94,13 @@ void Viewport::drawPoint(Object* objeto, cairo_t* cr){
 }
 
 void Viewport::drawLine(Object* objeto, cairo_t* cr) {
-	Coordinates transformed_vector = transformOneCoordinates(objeto->get_coords());
+	Coordinates transformed_vector = transformOneCoordinates(objeto->get_normalized_coords());
 	cairo_move_to(cr, transformed_vector[0][0], transformed_vector[0][1]);
 	cairo_line_to(cr, transformed_vector[1][0], transformed_vector[1][1]);
 	cairo_stroke(cr);
 }
 void Viewport::drawPolygon(Object* obj,cairo_t* cr) {
-	Coordinates transformed_vector = transformOneCoordinates(obj->get_coords());
+	Coordinates transformed_vector = transformOneCoordinates(obj->get_normalized_coords());
 	cairo_move_to(cr, transformed_vector[0][0], transformed_vector[0][1]);
 	for (int i = 1; i < transformed_vector.size(); ++i)
 		cairo_line_to(cr, transformed_vector[i][0], transformed_vector[i][1]);
@@ -85,18 +111,18 @@ void Viewport::drawPolygon(Object* obj,cairo_t* cr) {
 void Viewport::drawDisplayFile(cairo_t* cr) {
   //percorrer o displayfile enviando os objetos para o respectivo draw
   for (int i = 0; i < _objetos.tamanho(); ++i) {
-    auto teste = _objetos.retornaDaPosicao(i);
-    switch(teste->get_type()) {
+    auto obj = _objetos.retornaDaPosicao(i);
+    switch(obj->get_type()) {
       case obj_type::OBJECT:
         break;
       case obj_type::POINT:
-        drawPoint(teste, cr);
+        drawPoint(obj, cr);
         break;
       case obj_type::LINE:
-        drawLine(teste, cr);
+        drawLine(obj, cr);
         break;
       case obj_type::POLYGON:
-        drawPolygon(teste, cr);
+        drawPolygon(obj, cr);
         break;
     }
   }
