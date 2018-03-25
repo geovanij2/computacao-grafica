@@ -49,16 +49,16 @@ void Window::zoom(double step) {
 
 /* Move Window Horizontally */
 void Window::moveX(double value) {
-	double teta = Transformation::to_radians(_angle);
-	Coordinate coord(cos(teta)*value, -sin(teta)*value);
+	double teta = Transformation::to_radians(_angle+90);
+	Coordinate coord(sin(teta)*value, -cos(teta)*value);
 
 	_center += coord;
 }
 
 /* Move Window Vertically */
 void Window::moveY(double value) {
-	double teta = Transformation::to_radians(_angle);
-	Coordinate coord(sin(teta)*value, cos(teta)*value);
+	double teta = Transformation::to_radians(_angle+90);
+	Coordinate coord(cos(teta)*value, sin(teta)*value);
 
 	_center += coord;
 }
