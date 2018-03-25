@@ -21,6 +21,7 @@ class Viewport
     void zoom(double step);
     void moveX(double value);
     void moveY(double value);
+    void rotate_window(double degrees);
     void drawDisplayFile(cairo_t* cr);
     void addObject(Object* obj) { _objetos.adiciona(obj); normalize_obj(obj); };
     Object* getObject(int index) { _objetos.retornaDaPosicao(index);};
@@ -51,6 +52,11 @@ void Viewport::moveX(double step){
 }
 void Viewport::moveY(double step){
   _window->moveY(step);
+  normalize_all_objs();
+}
+
+void Viewport::rotate_window(double degrees) {
+  _window->rotate(degrees);
   normalize_all_objs();
 }
 

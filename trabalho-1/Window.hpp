@@ -21,6 +21,7 @@ class Window {
 		void zoom(double step);
 		void moveX(double value);
 		void moveY(double value);
+		void rotate(double degrees);
 
 		Coordinate lowmin() const { return Coordinate(-1,-1); }
 		Coordinate uppermax() const { return Coordinate(1,1); }
@@ -56,6 +57,10 @@ void Window::moveY(double value) {
 	Coordinate coord(0, value);
 
 	_center += coord;
+}
+
+void Window::rotate(double degrees) {
+	_angle += degrees;
 }
 
 void Window::update_transformation() {
