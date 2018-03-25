@@ -60,11 +60,11 @@ class Object {
 		}
 
 		Coordinate& get_normalized_coord_at_index(int index) {
-			return _coords[index];
+			return _normalized_coords[index];
 		}
 
 		const Coordinate& get_normalized_coord_at_index(int index) const {
-			return _coords[index];
+			return _normalized_coords[index];
 		}
 
 		Coordinate get_center_coord() {
