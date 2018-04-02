@@ -121,6 +121,8 @@ class Object {
 			return os;
 		}
 
+		virtual bool isFilled() {return false;}
+
 	protected:
 		void add_coordinate(double x, double y) {
 			_coords.emplace_back(x,y);
@@ -211,8 +213,9 @@ class Line : public Object {
 
 class Polygon : public Object {
 	public:
-		Polygon(std::string name, Coordinates coords) :
-			Object(name)
+		Polygon(std::string name, Coordinates coords, bool fill) :
+			Object(name),
+			_filled(fill)
 		{
 			if (coords.size() < 3) {
 				throw "Polygon must have at least 3 coordinates";
@@ -229,8 +232,11 @@ class Polygon : public Object {
 		virtual std::string getTypeName() const {
 			return "Polygon";
 		}
+
+		virtual bool isFilled() {return _filled;}
 	protected:
 	private:
+		bool _filled;
 };
 
 #endif
