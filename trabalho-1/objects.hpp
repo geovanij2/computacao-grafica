@@ -113,6 +113,10 @@ class Object {
 			}
 		}
 
+		void set_normalized_coords(const Coordinates& coords) {
+			_coords = coords;
+		}
+
 		friend std::ostream& operator<<(std::ostream& os, const Object& obj) {
 			os << obj.get_name() << ": [";
 			for (auto i = obj._coords.begin(); i != obj._coords.end(); ++i)
