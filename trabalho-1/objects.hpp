@@ -122,6 +122,10 @@ class Object {
 			for (auto i = obj._coords.begin(); i != obj._coords.end(); ++i)
 				os << *i << ',';
 			os << ']';
+			os << ", normalizado: [";
+			for (auto i = obj._normalized_coords.begin(); i != obj._normalized_coords.end(); ++i)
+				os << *i << ',';
+			os << ']';
 			return os;
 		}
 

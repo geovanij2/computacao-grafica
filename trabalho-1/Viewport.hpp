@@ -122,6 +122,8 @@ Coordinates Viewport::transformOneCoordinates(const Coordinates& coords) const {
 }
 
 void Viewport::drawPoint(Object* objeto, cairo_t* cr) {
+	if (objeto->get_normalized_coords().size() == 0)
+		return;
 	Coordinate coord = transformOneCoordinate(objeto->get_normalized_coord_at_index(0));
 	//prepareContext();
 	cairo_move_to(cr, coord[0]+10, coord[1]+10);
