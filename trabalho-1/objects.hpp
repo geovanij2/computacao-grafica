@@ -114,7 +114,7 @@ class Object {
 		}
 
 		void set_normalized_coords(const Coordinates& coords) {
-			_coords = coords;
+			_normalized_coords = coords;
 		}
 
 		friend std::ostream& operator<<(std::ostream& os, const Object& obj) {
