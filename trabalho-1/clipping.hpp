@@ -176,7 +176,7 @@ bool Clipping::liang_basky_line_clip(Coordinate& c0, Coordinate& c1) {
 		r = q/p;
 		if (p < 0) {
 			if (r > u0)
-				u1 = r;
+				u0 = r;
 		} else if (p > 0) {
 			if (r < u1)
 				u1 = r;

@@ -253,7 +253,7 @@ void on_change_obj_button_clicked (GtkWidget *widget, gpointer data) {
 	}
 	Object* obj = viewport->getObject(get_index_selected());
 	obj->transform_coords(id);
-	viewport->normalize_obj(obj);
+	viewport->normalize_and_clip_obj(obj);
 	accumulator.clear();
 }
 
@@ -304,12 +304,12 @@ void fill_treeview (const char* name, const char* type) {
 void check() {
   if (gtk_toggle_button_get_active(CS_Clipping)){
     gtk_toggle_button_set_active(LB_Clipping, false);
-    printf("CS\n");
+    viewport->changeLineClipAlg(Line_clip_algs::CS);
   } else if(gtk_toggle_button_get_active(LB_Clipping)) {
     gtk_toggle_button_set_active(CS_Clipping, false);
-    printf("LB\n");
+    viewport->changeLineClipAlg(Line_clip_algs::LB);
   } else 
-    printf("CS\n");
+    viewport->changeLineClipAlg(Line_clip_algs::CS);
 }
 void create_treeview (void) {
 	GtkCellRenderer *renderer;

@@ -31,6 +31,7 @@ class Viewport {
 		Coordinates transformOneCoordinates(const Coordinates& coords) const;
 		void normalize_obj(Object* obj);
 		void normalize_and_clip_obj(Object* obj);
+    void changeLineClipAlg(const Line_clip_algs alg){_clipper.set_line_clip_alg(alg); normalize_and_clip_all_objs();}
 
 	protected:
 	private:
