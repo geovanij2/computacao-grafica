@@ -31,6 +31,7 @@ GtkButton* rotate_left;
 GtkButton* rotate_right;
 GtkEntry* step_entry;
 GtkEntry* angle_entry;
+GtkToggleButton *LB_Clipping,*CS_Clipping;
 
 //Enum para TreeView
 enum {
@@ -69,6 +70,7 @@ GtkEntry* x_poly_entry;
 GtkEntry* y_poly_entry;
 GtkButton* add_point_poly;
 GtkButton* add_poly;
+GtkToggleButton* filled;
 
 //Objects from change_obj_w
 GObject* change_obj_w;
@@ -195,9 +197,9 @@ void on_add_point_poly_clicked (GtkWidget *widget, gpointer data) {
 }
 
 void on_add_poly_clicked (GtkWidget *widget, gpointer data) {
-	const gchar* name = gtk_entry_get_text(name_poly_entry);
+  const gchar* name = gtk_entry_get_text(name_poly_entry);
 	fill_treeview(name,"Polygon");
-	Polygon* polygon = new Polygon(name, polygon_coords);
+	Polygon* polygon = new Polygon(name, polygon_coords, gtk_toggle_button_get_active(filled));
 	viewport->addObject(polygon);
 	polygon_coords.clear();
 }
@@ -259,16 +261,16 @@ gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) {
 	cairo_set_source_rgb(cr, 1, 1, 1);
 	cairo_paint(cr);
 	cairo_set_source_rgb (cr, 1, 0, 0);
-	cairo_set_line_width(cr, 5.0);
+	cairo_set_line_width(cr, 1.0);
 
-	int width = gtk_widget_get_allocated_width (widget);
-	int height = gtk_widget_get_allocated_height (widget);
+	//int width = gtk_widget_get_allocated_width (widget);
+	//int height = gtk_widget_get_allocated_height (widget);
 	//530x535
-	cairo_move_to(cr, 0, 0);
-	cairo_line_to(cr, width, 0);
-	cairo_line_to(cr, width, height);
-	cairo_line_to(cr, 0, height);
-	cairo_line_to(cr, 0, 0);
+	cairo_move_to(cr, 10, 10);
+	cairo_line_to(cr, 520, 10);
+	cairo_line_to(cr, 520, 525);
+	cairo_line_to(cr, 10, 525);
+	cairo_line_to(cr, 10, 10);
 	cairo_stroke(cr);
 
 	cairo_set_source_rgb(cr, 0, 0, 0);
@@ -299,6 +301,16 @@ void fill_treeview (const char* name, const char* type) {
 	count_obj++;
 }
 
+void check() {
+  if (gtk_toggle_button_get_active(CS_Clipping)){
+    gtk_toggle_button_set_active(LB_Clipping, false);
+    printf("CS\n");
+  } else if(gtk_toggle_button_get_active(LB_Clipping)) {
+    gtk_toggle_button_set_active(CS_Clipping, false);
+    printf("LB\n");
+  } else 
+    printf("CS\n");
+}
 void create_treeview (void) {
 	GtkCellRenderer *renderer;
 	GtkTreeModel *model;
@@ -337,7 +349,7 @@ int main (int argc, char *argv[]) {
 	gtk_window_set_resizable (GTK_WINDOW(main_w),  false);
 
 	/* Tamanho da viewport */
-	viewport = new Viewport(530,535);
+	viewport = new Viewport(510,515);
 	/* Connect Treeview*/
 	objects_tree = GTK_TREE_VIEW(gtk_builder_get_object(builder, "object_tree"));
 	create_treeview();
@@ -459,7 +471,11 @@ int main (int argc, char *argv[]) {
 	angle_pointy_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_pointy_entry"));
 	sx_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sx_entry"));
 	sy_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sy_entry"));
-
+  filled = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"fill_poly_checkButton"));
+  CS_Clipping = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"CS_Clipping"));
+  LB_Clipping = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"LB_Clipping"));
+  g_signal_connect(CS_Clipping, "toggled", G_CALLBACK(check), NULL);
+  g_signal_connect(LB_Clipping, "toggled", G_CALLBACK(check), NULL);
 
 	gtk_widget_show(GTK_WIDGET(main_w));
 
