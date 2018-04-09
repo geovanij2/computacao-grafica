@@ -46,6 +46,7 @@ class Viewport {
 		void drawPoint(Object* objeto, cairo_t* cr);
 		void drawLine(Object* objeto, cairo_t* cr);
 		void drawPolygon(Object* objeto, cairo_t* cr);
+		void drawCurve(Object* obj, cairo_t* cr);
 
 };
 
@@ -149,11 +150,22 @@ void Viewport::drawPolygon(Object* obj,cairo_t* cr) {
 	for (int i = 1; i < transformed_vector.size(); ++i)
 		cairo_line_to(cr, transformed_vector[i][0]+10, transformed_vector[i][1]+10);
 	cairo_line_to(cr, transformed_vector[0][0]+10, transformed_vector[0][1]+10);
-  if(obj->isFilled()) {
-    cairo_fill(cr);
-  } else {
-	  cairo_stroke(cr); 
-  }
+	if(obj->isFilled()) {
+		cairo_fill(cr);
+	} else {
+		cairo_stroke(cr); 
+	}
+}
+
+void Viewport::drawCurve(Object* obj, cairo_t* cr) {
+	Coordinates transformed_vector = transformOneCoordinates(obj->get_normalized_coords());
+	if (transformed_vector.size() == 0)
+		return;
+	cairo_move_to(cr, transformed_vector[0][0]+10, transformed_vector[0][1]+10);
+	for (int i = 1; i < transformed_vector.size(); ++i)
+		cairo_line_to(cr, transformed_vector[i][0]+10, transformed_vector[i][1]+10);
+	cairo_stroke(cr);
+
 }
 
 void Viewport::drawDisplayFile(cairo_t* cr) {
@@ -171,6 +183,11 @@ void Viewport::drawDisplayFile(cairo_t* cr) {
 				break;
 			case obj_type::POLYGON:
 				drawPolygon(obj, cr);
+				break;
+			case obj_type::BEZIER_CURVE:
+				drawCurve(obj, cr);
+				break;
+			default:
 				break;
 		}
 	}

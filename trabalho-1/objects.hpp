@@ -9,7 +9,7 @@
 #include "Transformation.hpp"
 
 typedef std::vector<Coordinate> Coordinates;
-enum obj_type { OBJECT, POINT, LINE, POLYGON };
+enum obj_type { OBJECT, POINT, LINE, POLYGON, BEZIER_CURVE };
 
 class Object {
 	public:
@@ -245,6 +245,62 @@ class Polygon : public Object {
 	protected:
 	private:
 		bool _filled;
+};
+
+class Curve : public Object {
+	public:
+		Curve(std::string name, const Coordinates& coords) :
+			Object(name)
+		{
+			set_control_points(coords);
+			generate_curve();
+		}
+
+		virtual ~Curve() {}
+
+		virtual obj_type get_type() const {
+			return obj_type::BEZIER_CURVE;
+		}
+
+		virtual std::string getTypeName() const {
+			return "Bezier Curve";
+		}
+
+		Coordinates& get_control_points() {
+			return _control_points;
+		}
+
+		void generate_curve() {
+
+			int num_curves = ((_control_points.size() - 4)/3) + 1;
+
+			for (int i = 0; i < num_curves; i++) {
+				for (double t = 0; t < 1; t += _step) {
+					double t2 = t * t;
+					double t3 = t2 * t;
+
+					double x = (-t3 +3*t2 -3*t + 1) * _control_points[i*3+0][0] 
+								+ (3*t3 -6*t2 +3*t) * _control_points[i*3+1][0]
+								+ (-3*t3 +3*t2) * _control_points[i*3+2][0]
+								+ (t3) * _control_points[i*3+3][0];
+
+					double y = (-t3 +3*t2 -3*t + 1) * _control_points[i*3+0][1] 
+								+ (3*t3 -6*t2 +3*t) * _control_points[i*3+1][1]
+								+ (-3*t3 +3*t2) * _control_points[i*3+2][1]
+								+ (t3) * _control_points[i*3+3][1];
+
+					add_coordinate(x,y);
+				}
+			}
+		}
+	protected:
+	private:
+		Coordinates _control_points;
+		double _step = 0.01;
+
+		void set_control_points(const Coordinates& coords) {
+			_control_points.insert(_control_points.end(), coords.begin(), coords.end());
+		};
 };
 
 #endif

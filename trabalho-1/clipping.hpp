@@ -39,6 +39,8 @@ class Clipping {
 		void clip_top(Coordinates& input, Coordinates& output);
 		void clip_bottom(Coordinates& input, Coordinates& output);
 
+		bool clip_curve(Object* obj);
+
 		/* Attributes */
 		double _x_min, _x_max, _y_min, _y_max;
 		Line_clip_algs _alg = Line_clip_algs::CS;
@@ -59,6 +61,8 @@ bool Clipping::clip(Object* obj) {
 			return clip_line(obj->get_normalized_coord_at_index(0), obj->get_normalized_coord_at_index(1));
 		case obj_type::POLYGON:
 			return clip_polygon(obj);
+		case obj_type::BEZIER_CURVE:
+			return clip_curve(obj);
 		default:
 			return false;
 	}
@@ -348,6 +352,36 @@ void Clipping::clip_bottom(Coordinates& input, Coordinates& output) {
 			output.push_back(c1);
 		}
 	}
+};
+
+bool Clipping::clip_curve(Object* obj) {
+	Coordinates& coords = obj->get_normalized_coords();
+	Coordinates new_curve;
+	bool prev_inside = true;
+	Coordinate prev(2);
+
+	for (int i = 0; i < coords.size(); i++) {
+		if (clip_point(coords[i])) {
+			if (!prev_inside) {
+				clip_line(prev, coords[i]);
+				new_curve.push_back(prev);
+			}
+			new_curve.push_back(coords[i]);
+			prev_inside = true;
+		} else {
+			if (prev_inside && new_curve.size() != 0) {
+				clip_line(prev, coords[i]);
+				new_curve.push_back(coords[i]);
+			}
+			prev_inside = false;
+		}
+		prev = coords[i];
+	}
+	if (new_curve.size() == 0)
+		return false;
+
+	obj->set_normalized_coords(new_curve);
+	return true;
 };
 
 #endif // CLIPPING_HPP
