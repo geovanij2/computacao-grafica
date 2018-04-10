@@ -312,26 +312,27 @@ void on_change_obj_button_clicked (GtkWidget *widget, gpointer data) {
 }
 
 gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) {
+	cairo_set_source_rgb (cr, 1, 0, 0);
 	cairo_set_source_rgb(cr, 1, 1, 1);
 	cairo_paint(cr);
 
   //int width = gtk_widget_get_allocated_width (widget);
   //int height = gtk_widget_get_allocated_height (widget);
   //530x535
-  cairo_set_source_rgb(cr, 0, 0, 0);
-  cairo_set_line_width(cr, 1.0);
+    cairo_set_source_rgb(cr, 0, 0, 0);
+    cairo_set_line_width(cr, 1.0);
 
-  viewport->drawDisplayFile(cr);
+    viewport->drawDisplayFile(cr);
   
 	cairo_set_source_rgb (cr, 1, 0, 0);
 	cairo_set_line_width(cr, 2.0);
 
-  cairo_move_to(cr, 10, 10);
-  cairo_line_to(cr, 520, 10);
-  cairo_line_to(cr, 520, 525);
-  cairo_line_to(cr, 10, 525);
-  cairo_line_to(cr, 10, 10);
-  cairo_stroke(cr);
+    cairo_move_to(cr, 10, 10);
+    cairo_line_to(cr, 520, 10);
+    cairo_line_to(cr, 520, 525);
+    cairo_line_to(cr, 10, 525);
+    cairo_line_to(cr, 10, 10);
+    cairo_stroke(cr);
 
 
 	gtk_widget_queue_draw(draw_viewport);
