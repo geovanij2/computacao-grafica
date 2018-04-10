@@ -9,6 +9,7 @@
 //Objetos da main window
 Viewport* viewport;
 Coordinates polygon_coords;
+Coordinates curve_coords;
 std::vector<Transformation> accumulator;
 
 GObject *main_w;
@@ -48,6 +49,7 @@ GObject* add_geometric_shape_w;
 GtkButton* add_point1;
 GtkButton* add_line1;
 GtkButton* add_poly1;
+GtkButton* add_curve1;
 
 //Objetos da janela de adicionar ponto, linha e poligono
 GObject* add_point_w;
@@ -71,6 +73,14 @@ GtkEntry* y_poly_entry;
 GtkButton* add_point_poly;
 GtkButton* add_poly;
 GtkToggleButton* filled;
+
+GObject* add_curve_w;
+GtkEntry* name_curve_entry;
+GtkEntry* x_curve_entry;
+GtkEntry* y_curve_entry;
+GtkButton* add_point_curve;
+GtkButton* add_curve;
+GtkLabel* label_number_points;
 
 //Objects from change_obj_w
 GObject* change_obj_w;
@@ -163,6 +173,11 @@ void on_add_poly1_clicked (GtkWidget *widget, gpointer data) {
 	gtk_widget_show (GTK_WIDGET(add_poly_w));
 }
 
+void on_add_curve1_clicked (GtkWidget *widget, gpointer data) {
+  gtk_widget_show (GTK_WIDGET(add_curve_w));
+}
+
+
 /* ADD_POINT_W */
 void on_add_point_clicked (GtkWidget *widget, gpointer data) {
 	const gchar* name = gtk_entry_get_text(name_point_entry);
@@ -172,6 +187,10 @@ void on_add_point_clicked (GtkWidget *widget, gpointer data) {
 	fill_treeview(name,"Point");
 	Point* point = new Point(name, x1, y1);
 	viewport->addObject(point);
+
+  gtk_entry_set_text(name_point_entry,"");
+  gtk_entry_set_text(x1_point_entry,"");
+  gtk_entry_set_text(y1_point_entry,"");
 }
 
 /* ADD_LINE_W */
@@ -185,15 +204,21 @@ void on_add_line_clicked (GtkWidget *widget, gpointer data) {
 	fill_treeview(name,"Line");
 	Line* line = new Line(name, x1, y1, x2, y2);
 	viewport->addObject(line);
+  gtk_entry_set_text(name_line_entry,"");
+  gtk_entry_set_text(x1_line_entry,"");
+  gtk_entry_set_text(x2_line_entry,"");
+  gtk_entry_set_text(y1_line_entry,"");
+  gtk_entry_set_text(y2_line_entry,"");  
 
 }
 
 /* ADD_POLY */
 void on_add_point_poly_clicked (GtkWidget *widget, gpointer data) {
-	const gchar* name = gtk_entry_get_text(name_poly_entry);
 	double x1 = atof(gtk_entry_get_text(x_poly_entry));
 	double y1 = atof(gtk_entry_get_text(y_poly_entry));
 	polygon_coords.push_back(Coordinate(x1,y1));
+  gtk_entry_set_text(x_poly_entry,"");
+  gtk_entry_set_text(y_poly_entry,"");
 }
 
 void on_add_poly_clicked (GtkWidget *widget, gpointer data) {
@@ -202,6 +227,35 @@ void on_add_poly_clicked (GtkWidget *widget, gpointer data) {
 	Polygon* polygon = new Polygon(name, polygon_coords, gtk_toggle_button_get_active(filled));
 	viewport->addObject(polygon);
 	polygon_coords.clear();
+  gtk_entry_set_text(name_poly_entry, "");
+}
+/* ADD CURVE */
+void on_add_point_curve_clicked (GtkWidget *widget, gpointer data) {
+  double x1 = atof(gtk_entry_get_text(x_curve_entry));
+  double y1 = atof(gtk_entry_get_text(y_curve_entry));
+  curve_coords.push_back(Coordinate(x1,y1));
+  int n = atoi(gtk_label_get_text(label_number_points));
+  //char* s;
+  //itoa(++n, s, 10);
+  char buf[10];
+  sprintf(buf, "  %d  ", ++n);
+
+  gtk_label_set_text(label_number_points, buf);
+  gtk_entry_set_text(x_curve_entry, "");
+  gtk_entry_set_text(y_curve_entry, "");
+}
+
+void on_add_curve_clicked (GtkWidget *widget, gpointer data) {
+  const gchar* name = gtk_entry_get_text(name_curve_entry);
+  fill_treeview(name,"Curve");
+  Curve* curve = new Curve(name, curve_coords);
+  viewport->addObject(curve);
+  curve_coords.clear();
+  
+  gtk_label_set_text(label_number_points, "  0  ");
+  gtk_entry_set_text(x_curve_entry, "");
+  gtk_entry_set_text(y_curve_entry, "");
+  gtk_entry_set_text(name_curve_entry, "");
 }
 
 /* Buttons Change object */
@@ -260,25 +314,25 @@ void on_change_obj_button_clicked (GtkWidget *widget, gpointer data) {
 gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) {
 	cairo_set_source_rgb(cr, 1, 1, 1);
 	cairo_paint(cr);
+
+  //int width = gtk_widget_get_allocated_width (widget);
+  //int height = gtk_widget_get_allocated_height (widget);
+  //530x535
+  cairo_set_source_rgb(cr, 0, 0, 0);
+  cairo_set_line_width(cr, 1.0);
+
+  viewport->drawDisplayFile(cr);
+  
 	cairo_set_source_rgb (cr, 1, 0, 0);
-	cairo_set_line_width(cr, 1.0);
+	cairo_set_line_width(cr, 2.0);
 
-	//int width = gtk_widget_get_allocated_width (widget);
-	//int height = gtk_widget_get_allocated_height (widget);
-	//530x535
-	cairo_move_to(cr, 10, 10);
-	cairo_line_to(cr, 520, 10);
-	cairo_line_to(cr, 520, 525);
-	cairo_line_to(cr, 10, 525);
-	cairo_line_to(cr, 10, 10);
-	cairo_stroke(cr);
+  cairo_move_to(cr, 10, 10);
+  cairo_line_to(cr, 520, 10);
+  cairo_line_to(cr, 520, 525);
+  cairo_line_to(cr, 10, 525);
+  cairo_line_to(cr, 10, 10);
+  cairo_stroke(cr);
 
-	cairo_set_source_rgb(cr, 0, 0, 0);
-	cairo_set_line_width(cr, 1.0);
-	viewport->drawDisplayFile(cr);
-
-	cairo_set_source_rgb(cr, 0, 0, 0);
-	cairo_set_line_width(cr, 1);
 
 	gtk_widget_queue_draw(draw_viewport);
 	return FALSE;
@@ -402,6 +456,9 @@ int main (int argc, char *argv[]) {
 	add_poly1 = GTK_BUTTON(gtk_builder_get_object(builder, "add_poly1"));
 	g_signal_connect (add_poly1, "clicked", G_CALLBACK (on_add_poly1_clicked), NULL);
 
+  add_curve1 = GTK_BUTTON(gtk_builder_get_object(builder, "add_curve1"));
+  g_signal_connect (add_curve1, "clicked", G_CALLBACK (on_add_curve1_clicked), NULL);
+
 
 	/* Delete action windows*/
 	add_point_w = gtk_builder_get_object (builder, "add_point_w");
@@ -413,7 +470,10 @@ int main (int argc, char *argv[]) {
 	add_poly_w = gtk_builder_get_object (builder, "add_poly_w");
 	g_signal_connect (add_poly_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
 
-	/* Buttons point, line and poly*/
+  add_curve_w = gtk_builder_get_object (builder, "add_curve_w");
+  g_signal_connect (add_curve_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
+
+	/* Buttons point, line, poly and curve*/
 	add_point = GTK_BUTTON(gtk_builder_get_object(builder, "add_point"));
 	g_signal_connect (add_point, "clicked", G_CALLBACK (on_add_point_clicked), NULL);
 
@@ -425,6 +485,12 @@ int main (int argc, char *argv[]) {
 
 	add_poly = GTK_BUTTON(gtk_builder_get_object(builder, "add_poly"));
 	g_signal_connect (add_poly, "clicked", G_CALLBACK (on_add_poly_clicked), NULL);
+
+  add_point_curve = GTK_BUTTON(gtk_builder_get_object(builder, "add_point_curve"));
+  g_signal_connect (add_point_curve, "clicked", G_CALLBACK (on_add_point_curve_clicked), NULL);
+
+  add_curve = GTK_BUTTON(gtk_builder_get_object(builder, "add_curve"));
+  g_signal_connect (add_curve, "clicked", G_CALLBACK (on_add_curve_clicked), NULL);
 
 	/* Buttons Change object */
 	change_obj_w = gtk_builder_get_object (builder, "change_obj_w");
@@ -476,6 +542,10 @@ int main (int argc, char *argv[]) {
   LB_Clipping = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"LB_Clipping"));
   g_signal_connect(CS_Clipping, "toggled", G_CALLBACK(check), NULL);
   g_signal_connect(LB_Clipping, "toggled", G_CALLBACK(check), NULL);
+  name_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_curve_entry"));
+  x_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "x_curve_entry"));
+  y_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "y_curve_entry"));
+  label_number_points = GTK_LABEL(gtk_builder_get_object(builder, "label_number_points"));
 
 	gtk_widget_show(GTK_WIDGET(main_w));
 
