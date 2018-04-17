@@ -184,6 +184,7 @@ void Viewport::drawDisplayFile(cairo_t* cr) {
 			case obj_type::POLYGON:
 				drawPolygon(obj, cr);
 				break;
+			case obj_type::BSPLINE_CURVE:
 			case obj_type::BEZIER_CURVE:
 				drawCurve(obj, cr);
 				break;

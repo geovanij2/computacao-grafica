@@ -61,6 +61,7 @@ bool Clipping::clip(Object* obj) {
 			return clip_line(obj->get_normalized_coord_at_index(0), obj->get_normalized_coord_at_index(1));
 		case obj_type::POLYGON:
 			return clip_polygon(obj);
+		case obj_type::BSPLINE_CURVE:
 		case obj_type::BEZIER_CURVE:
 			return clip_curve(obj);
 		default:
