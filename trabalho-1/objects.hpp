@@ -9,7 +9,13 @@
 #include "Transformation.hpp"
 
 typedef std::vector<Coordinate> Coordinates;
-enum obj_type { OBJECT, POINT, LINE, POLYGON, BEZIER_CURVE };
+enum obj_type { OBJECT,
+				POINT,
+				LINE,
+				POLYGON,
+				CURVE,
+				BEZIER_CURVE,
+				BSPLINE_CURVE };
 
 class Object {
 	public:
@@ -249,14 +255,46 @@ class Polygon : public Object {
 
 class Curve : public Object {
 	public:
-		Curve(std::string name, const Coordinates& coords) :
+		Curve(std::string& name) :
 			Object(name)
+		{}
+
+		virtual ~Curve() {}
+
+		virtual obj_type get_type() const {
+			return obj_type::CURVE;
+		}
+
+		virtual std::string getTypeName() const {
+			return "Curve";
+		}
+
+		Coordinates& get_control_points() {
+			return _control_points;
+		}
+
+		virtual void generate_curve() {}
+	protected:
+
+		void set_control_points(const Coordinates& coords) {
+			_control_points.insert(_control_points.end(), coords.begin(), coords.end());
+		};
+
+		Coordinates _control_points;
+		double _step = 0.01;
+
+};
+
+class BezierCurve : public Curve {
+	public:
+		BezierCurve(std::string name, const Coordinates& coords) :
+			Curve(name)
 		{
 			set_control_points(coords);
 			generate_curve();
 		}
 
-		virtual ~Curve() {}
+		virtual ~BezierCurve() {}
 
 		virtual obj_type get_type() const {
 			return obj_type::BEZIER_CURVE;
@@ -266,11 +304,7 @@ class Curve : public Object {
 			return "Bezier Curve";
 		}
 
-		Coordinates& get_control_points() {
-			return _control_points;
-		}
-
-		void generate_curve() {
+		virtual void generate_curve() {
 
 			int num_curves = ((_control_points.size() - 4)/3) + 1;
 
@@ -295,12 +329,6 @@ class Curve : public Object {
 		}
 	protected:
 	private:
-		Coordinates _control_points;
-		double _step = 0.01;
-
-		void set_control_points(const Coordinates& coords) {
-			_control_points.insert(_control_points.end(), coords.begin(), coords.end());
-		};
 };
 
 #endif

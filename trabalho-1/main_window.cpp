@@ -247,8 +247,8 @@ void on_add_point_curve_clicked (GtkWidget *widget, gpointer data) {
 
 void on_add_curve_clicked (GtkWidget *widget, gpointer data) {
   const gchar* name = gtk_entry_get_text(name_curve_entry);
-  fill_treeview(name,"Curve");
-  Curve* curve = new Curve(name, curve_coords);
+  fill_treeview(name,"Bezier Curve");
+  BezierCurve* curve = new BezierCurve(name, curve_coords);
   viewport->addObject(curve);
   curve_coords.clear();
   
