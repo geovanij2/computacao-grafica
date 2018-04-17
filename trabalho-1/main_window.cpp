@@ -81,6 +81,7 @@ GtkEntry* y_curve_entry;
 GtkButton* add_point_curve;
 GtkButton* add_curve;
 GtkLabel* label_number_points;
+GtkToggleButton* bspline_check;
 
 //Objects from change_obj_w
 GObject* change_obj_w;
@@ -247,10 +248,18 @@ void on_add_point_curve_clicked (GtkWidget *widget, gpointer data) {
 
 void on_add_curve_clicked (GtkWidget *widget, gpointer data) {
   const gchar* name = gtk_entry_get_text(name_curve_entry);
-  fill_treeview(name,"Bezier Curve");
-  BezierCurve* curve = new BezierCurve(name, curve_coords);
-  viewport->addObject(curve);
-  curve_coords.clear();
+  if (gtk_toggle_button_get_active(bspline_check)){
+    fill_treeview(name,"B-Spline Curve");
+    BsplineCurve* curve = new BsplineCurve(name, curve_coords);
+    viewport->addObject(curve);
+    curve_coords.clear();
+  } else {
+    fill_treeview(name,"Bezier Curve");
+    BezierCurve* curve = new BezierCurve(name, curve_coords);
+    viewport->addObject(curve);
+    curve_coords.clear();
+  }
+ 
   
   gtk_label_set_text(label_number_points, "  0  ");
   gtk_entry_set_text(x_curve_entry, "");
@@ -324,7 +333,7 @@ gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) {
 
     viewport->drawDisplayFile(cr);
   
-	cairo_set_source_rgb (cr, 1, 0, 0);
+	cairo_set_source_rgb (cr, 0, 0, 0);
 	cairo_set_line_width(cr, 2.0);
 
     cairo_move_to(cr, 10, 10);
@@ -547,6 +556,7 @@ int main (int argc, char *argv[]) {
   x_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "x_curve_entry"));
   y_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "y_curve_entry"));
   label_number_points = GTK_LABEL(gtk_builder_get_object(builder, "label_number_points"));
+  bspline_check = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"bspline_check"));
 
 	gtk_widget_show(GTK_WIDGET(main_w));
 

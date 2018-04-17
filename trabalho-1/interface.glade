@@ -17,7 +17,7 @@
               <object class="GtkLabel" id="label13">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">        nome:        </property>
+                <property name="label" translatable="yes">        name:        </property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -141,6 +141,19 @@
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkCheckButton" id="bspline_check">
+                    <property name="label" translatable="yes">B-splines</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">False</property>
+                    <property name="draw_indicator">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">3</property>
                     <property name="top_attach">0</property>
                   </packing>
                 </child>
@@ -268,7 +281,7 @@
               <object class="GtkLabel" id="label12">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">          nome:   </property>
+                <property name="label" translatable="yes">          name:   </property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -441,7 +454,7 @@
               <object class="GtkLabel" id="label5">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">     nome:     </property>
+                <property name="label" translatable="yes">     name:     </property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -556,7 +569,7 @@
               <object class="GtkLabel" id="label11">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">        nome:        </property>
+                <property name="label" translatable="yes">        name:        </property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -648,9 +661,10 @@
               <object class="GtkGrid" id="gridpoly">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="column_homogeneous">True</property>
                 <child>
                   <object class="GtkButton" id="add_point_poly">
-                    <property name="label" translatable="yes">    Adiciona coordenada     </property>
+                    <property name="label" translatable="yes">    Add coordinate     </property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -685,7 +699,7 @@
             </child>
             <child>
               <object class="GtkButton" id="add_poly">
-                <property name="label" translatable="yes">Finalizar</property>
+                <property name="label" translatable="yes">Finish</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
@@ -1110,7 +1124,7 @@
                             </child>
                             <child>
                               <object class="GtkButton" id="schedule_button">
-                                <property name="label" translatable="yes">Schedule</property>
+                                <property name="label" translatable="yes">Scaling</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
