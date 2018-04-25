@@ -21,39 +21,85 @@ class Transformation {
 			return this->_m;
 		};
 
-		static Transformation generate_2D_translation_matrix(double x, double y) {
-			Matrix m = { {1, 0, 0},
-						 {0, 1, 0},
-						 {x, y, 1} };
+		static Transformation generate_translation_matrix(double x, double y, double z) {
+			Matrix m = { {1, 0, 0, 0},
+						 {0, 1, 0, 0},
+						 {0, 0, 1, 0},
+						 {x, y, z, 1} };
 			return Transformation(m);
 		};
 
-		static Transformation generate_2D_scaling_around_obj_center_matrix(double sx, double sy, const Coordinate& obj_center) {
-			return generate_2D_translation_matrix(-obj_center[0],-obj_center[1]) * generate_2D_scaling_matrix(sx,sy) * generate_2D_translation_matrix(obj_center[0],obj_center[1]);
+		static Transformation generate_scaling_around_obj_center_matrix(double sx, double sy, double sz, const Coordinate& obj_center) {
+			return generate_translation_matrix(-obj_center[0],-obj_center[1],-obj_center[2])
+				* generate_scaling_matrix(sx,sy,sz)
+				* generate_translation_matrix(obj_center[0],obj_center[1],obj_center[2]);
 		};
 
-		static Transformation generate_2D_rotation_around_point(double degrees, const Coordinate& coord) {
-			return generate_2D_translation_matrix(-coord[0], -coord[1]) * generate_2D_rotation_matrix(degrees) * generate_2D_translation_matrix(coord[0], coord[1]);
+		static Transformation generate_full_rotation(double angle_x, double angle_y, double angle_z, double angle_a, const Coordinate& coord) {	 	  	 	     	  		  	  	    	      	 	
+			return generate_rx(angle_x) * generate_ry(angle_y) * generate_rz(angle_z) * generate_ra(angle_a, coord);
 		};
 
 		static double to_radians(double degrees) {
 			return (PI/180) * degrees;
 		};
 
-		static Transformation generate_2D_scaling_matrix(double sx, double sy) {
-			Matrix m = { {sx, 0, 0},
-						 {0, sy, 0},
-						 {0, 0, 1} };
+		static Transformation generate_scaling_matrix(double sx, double sy, double sz) {
+			Matrix m = { {sx, 0, 0, 0},
+						 {0, sy, 0, 0},
+						 {0, 0, sz, 0},
+						 {0, 0,  0, 1} };
 			return Transformation(m);
 		};
 
-		static Transformation generate_2D_rotation_matrix(double degrees) {
-			double rad = -to_radians(degrees);
+		static Transformation generate_rx(double angle_x, bool isRad=false) {
+			double rad = isRad ? angle_x : -to_radians(angle_x);
 
-			Matrix m = { {cos(rad), -sin(rad), 0},
-						 {sin(rad), cos(rad), 0},
-						 {0, 0, 1} };
+			Matrix m = { {1,  	 0,			0,	  0},
+						 {0,  cos(rad), sin(rad), 0},
+						 {0, -sin(rad), cos(rad), 0},
+						 {0,  	 0,			0,	  1} };
+
 			return Transformation(m);
+		}
+
+		static Transformation generate_ry(double angle_y, bool isRad=false) {
+			double rad = isRad ? angle_y : -to_radians(angle_y);
+
+			Matrix m = { {cos(rad), 0, -sin(rad), 0},
+						 {	  0,	1,		0,	  0},
+						 {sin(rad), 0,  cos(rad), 0},
+						 {	  0,	0,		0,	  1} };
+
+			return Transformation(m);
+		}	 	  	 	     	  		  	  	    	      	 	
+
+		static Transformation generate_rz(double angle_z, bool isRad=false) {
+			double rad = isRad ? angle_z : -to_radians(angle_z);
+
+			Matrix m = { { cos(rad), sin(rad), 0, 0},
+						 {-sin(rad), cos(rad), 0, 0},
+						 {	  0,		0,	   1, 0},
+						 {	  0,		0,	   0, 1} };
+
+			return Transformation(m);
+		}
+
+		static Transformation generate_ra(double angle_a, const Coordinate& p) {
+			double d = sqrt(p[1] * p[1] + p[2] * p[2]);
+			double beta = atan(p[0]/p[2]);
+			double alpha = atan(p[1]/d);
+
+			return generate_translation_matrix(-p[0],-p[1],-p[2])
+				* generate_ry(-beta, true)
+				* generate_rx(alpha, true)
+				* generate_rz(angle_a)
+				* generate_rx(-alpha, true)
+				* generate_ry(beta, true)
+				* generate_translation_matrix(p[0],p[1],p[2]);
+		}
+
+		static Transformation generate_rotation_matrix(double angle_x, double angle_y, double angle_z) {
+			return generate_rx(angle_x) * generate_ry(angle_y) * generate_rz(angle_z);
 		};
 
 		Transformation& operator*=(const Transformation& other) {
@@ -62,7 +108,7 @@ class Transformation {
 			int size = m1.size();
 			if (size != m2.size())
 				throw "Transformations have different dimensions";
-			for (int i = 0; i < size; i++) {
+			for (int i = 0; i < size; i++) {	 	  	 	     	  		  	  	    	      	 	
 				for (int j = 0; j < size; j++) {
 					_m[i][j] = 0;
 					for (int k = 0; k < size; k++) {
@@ -98,3 +144,4 @@ class Transformation {
 };
 
 #endif
+	 	  	 	     	  		  	  	    	      	 	

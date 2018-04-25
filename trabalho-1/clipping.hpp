@@ -44,7 +44,7 @@ class Clipping {
 		/* Attributes */
 		double _x_min, _x_max, _y_min, _y_max;
 		Line_clip_algs _alg = Line_clip_algs::CS;
-		enum RC { 
+		enum RC {	 	  	 	     	  		  	  	    	      	 	
 			INSIDE = 0,
 			LEFT = 1,
 			RIGHT = 2,
@@ -54,7 +54,11 @@ class Clipping {
 };
 
 bool Clipping::clip(Object* obj) {
+    Object3D *obj_3d;
+    bool draw;
 	switch(obj->get_type()) {
+		case obj_type::OBJECT:
+			break;
 		case obj_type::POINT:
 			return clip_point(obj->get_normalized_coord_at_index(0));
 		case obj_type::LINE:
@@ -64,9 +68,20 @@ bool Clipping::clip(Object* obj) {
 		case obj_type::BSPLINE_CURVE:
 		case obj_type::BEZIER_CURVE:
 			return clip_curve(obj);
+		case obj_type::OBJECT_3D:
+			obj_3d = (Object3D*) obj;
+			draw = false;
+			for (auto &face : obj_3d->get_face_list()) {
+				bool tmp = clip_polygon(&face);
+				if (!tmp) {
+					face.get_normalized_coords().clear();
+				}
+				draw |= tmp;
+			}
+			return draw;
 		default:
 			return false;
-	}
+	}	 	  	 	     	  		  	  	    	      	 	
 };
 
 bool Clipping::clip_point(const Coordinate& c) {
@@ -108,7 +123,7 @@ bool Clipping::cohen_sutherland_line_clip(Coordinate& c0, Coordinate& c1) {
 	int rc0 = compute_coord_rc(c0);
 	int rc1 = compute_coord_rc(c1);
 
-	while (true) {
+	while (true) {	 	  	 	     	  		  	  	    	      	 	
 		if (!(rc0 | rc1))
 			return true;
 		else if (rc0 & rc1)
@@ -145,7 +160,7 @@ bool Clipping::cohen_sutherland_line_clip(Coordinate& c0, Coordinate& c1) {
 	}
 };
 
-bool Clipping::liang_basky_line_clip(Coordinate& c0, Coordinate& c1) {
+bool Clipping::liang_basky_line_clip(Coordinate& c0, Coordinate& c1) {	 	  	 	     	  		  	  	    	      	 	
 	if (c0 == c1)
 		return clip_point(c0);
 
@@ -182,7 +197,7 @@ bool Clipping::liang_basky_line_clip(Coordinate& c0, Coordinate& c1) {
 		if (p < 0) {
 			if (r > u0)
 				u0 = r;
-		} else if (p > 0) {
+		} else if (p > 0) {	 	  	 	     	  		  	  	    	      	 	
 			if (r < u1)
 				u1 = r;
 		}
@@ -219,7 +234,7 @@ bool Clipping::sutherland_hodgman_polygon_clip(Object* obj) {
 	return true;
 };
 
-void Clipping::clip_left(Coordinates& input, Coordinates& output) {
+void Clipping::clip_left(Coordinates& input, Coordinates& output) {	 	  	 	     	  		  	  	    	      	 	
 	if (output.size() > 0)
 		output.clear();
 	if (input.size() == 0)
@@ -260,7 +275,7 @@ void Clipping::clip_right(Coordinates& input, Coordinates& output) {
 
 	double clip_x = _x_max;
 	input.push_back(input[0]);
-	for (unsigned int i = 0; i < input.size()-1; i++) {
+	for (unsigned int i = 0; i < input.size()-1; i++) {	 	  	 	     	  		  	  	    	      	 	
 		Coordinate c0 = input[i];
 		Coordinate c1 = input[i+1];
 
@@ -298,7 +313,7 @@ void Clipping::clip_top(Coordinates& input, Coordinates& output) {
 		Coordinate c1 = input[i+1];
 
 		//Caso 1: out -> out
-		if(c0[1] > clip_y && c1[1] > clip_y) {}
+		if(c0[1] > clip_y && c1[1] > clip_y) {}	 	  	 	     	  		  	  	    	      	 	
 
 		//Caso 2: in -> in
 		if(c0[1] <= clip_y && c1[1] <= clip_y)
@@ -348,7 +363,7 @@ void Clipping::clip_bottom(Coordinates& input, Coordinates& output) {
 			output.emplace_back(x,y);
 
 		//Caso 4: out -> in
-		if(c0[1] < clip_y && c1[1] >= clip_y){
+		if(c0[1] < clip_y && c1[1] >= clip_y){	 	  	 	     	  		  	  	    	      	 	
 			output.emplace_back(x,y);
 			output.push_back(c1);
 		}
@@ -386,3 +401,4 @@ bool Clipping::clip_curve(Object* obj) {
 };
 
 #endif // CLIPPING_HPP
+	 	  	 	     	  		  	  	    	      	 	

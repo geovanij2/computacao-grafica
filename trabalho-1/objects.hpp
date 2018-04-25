@@ -8,6 +8,8 @@
 #include "coordinate.hpp"
 #include "Transformation.hpp"
 
+#define N 3
+
 typedef std::vector<Coordinate> Coordinates;
 enum obj_type { OBJECT,
 				POINT,
@@ -15,7 +17,8 @@ enum obj_type { OBJECT,
 				POLYGON,
 				CURVE,
 				BEZIER_CURVE,
-				BSPLINE_CURVE };
+				BSPLINE_CURVE,
+				OBJECT_3D };
 
 class Object {
 	public:
@@ -31,7 +34,7 @@ class Object {
 
 		const std::string get_name() const {
 			return _name;
-		}
+		}	 	  	 	     	  		  	  	    	      	 	
 
 		virtual obj_type get_type() const {
 			return obj_type::OBJECT;
@@ -67,15 +70,14 @@ class Object {
 
 		Coordinate& get_normalized_coord_at_index(int index) {
 			return _normalized_coords[index];
-		}
+		}	 	  	 	     	  		  	  	    	      	 	
 
 		const Coordinate& get_normalized_coord_at_index(int index) const {
 			return _normalized_coords[index];
 		}
 
-		Coordinate get_center_coord() {
-			int dim = _coords[0].size()-1;
-			Coordinate sum(dim);
+		virtual Coordinate get_center_coord() {
+			Coordinate sum(N);
 			for (int i = 0; i < _coords.size(); i++)
 				sum += _coords[i];
 			for (int i = 0; i < sum.size()-1; i++)
@@ -83,9 +85,8 @@ class Object {
 			return sum;
 		}
 
-		Coordinate get_normalized_center_coord() {
-			int dim = _normalized_coords[0].size()-1;
-			Coordinate sum(dim);
+		virtual Coordinate get_normalized_center_coord() {
+			Coordinate sum(N);
 			for (int i = 0; i < _normalized_coords.size(); i++)
 				sum += _normalized_coords[i];
 			for (int i = 0; i < sum.size()-1; i++)
@@ -101,14 +102,14 @@ class Object {
 			return *this;
 		}
 
-		void transform_coords(const Transformation& t) {
+		virtual void transform_coords(const Transformation& t) {
 			Matrix m = t.get_transformation_matrix();
 			for (int i = 0; i < _coords.size(); i++) {
 				_coords[i].transform(m);
-			}
+			}	 	  	 	     	  		  	  	    	      	 	
 		}
 
-		void set_normalized_coords(const Transformation& t) {
+		virtual void set_normalized_coords(const Transformation& t) {
 			if (_normalized_coords.size() > 0)
 				_normalized_coords.clear();
 			Matrix m = t.get_transformation_matrix();
@@ -135,18 +136,14 @@ class Object {
 			return os;
 		}
 
-		virtual bool isFilled() {return false;}
+		virtual bool isFilled() { return false; }
 
 	protected:
-		void add_coordinate(double x, double y) {
-			_coords.emplace_back(x,y);
-		}
-
 		void add_coordinate(double x , double y, double z) {
 			_coords.emplace_back(x,y,z);
 		}
 
-		void add_coordinate(const Coordinate& coord) {
+		void add_coordinate(const Coordinate& coord) {	 	  	 	     	  		  	  	    	      	 	
 			_coords.push_back(coord);
 		}
 
@@ -162,10 +159,10 @@ class Object {
 class Point : public Object {
 
 	public:
-		Point(std::string name, double x, double y) :
+		Point(std::string name, double x, double y, double z) :
 			Object(name)
 		{
-			this->add_coordinate(x,y);
+			this->add_coordinate(x,y,z);
 		}
 
 		Point(std::string name, Coordinate coord) :
@@ -182,18 +179,20 @@ class Point : public Object {
 
 		virtual std::string get_type_name() const {
 			return "Point";
-		}
+		}	 	  	 	     	  		  	  	    	      	 	
 	protected:
 	private:
 };
 
 class Line : public Object {
 	public:
-		Line(std::string name, double xi, double yi, double xf, double yf) :
+		Line(std::string name,
+			 double xi, double yi, double zi,
+			 double xf, double yf, double zf) :
 			Object(name)
 		{
-			this->add_coordinate(xi,yi);
-			this->add_coordinate(xf,yf);
+			this->add_coordinate(xi, yi, zi);
+			this->add_coordinate(xf, yf, zf);
 		}
 
 		Line(std::string name, Coordinate initial_coord, Coordinate final_coord) :
@@ -216,7 +215,7 @@ class Line : public Object {
 
 		virtual obj_type get_type() const {
 			return obj_type::LINE;
-		}
+		}	 	  	 	     	  		  	  	    	      	 	
 
 		virtual std::string get_type_name() const {
 			return "Line";
@@ -253,7 +252,7 @@ class Polygon : public Object {
 		bool _filled;
 };
 
-class Curve : public Object {
+class Curve : public Object {	 	  	 	     	  		  	  	    	      	 	
 	public:
 		Curve(std::string& name) :
 			Object(name)
@@ -289,7 +288,7 @@ class BezierCurve : public Curve {
 	public:
 		BezierCurve(std::string name, const Coordinates& coords) :
 			Curve(name)
-		{
+		{	 	  	 	     	  		  	  	    	      	 	
 			set_control_points(coords);
 			generate_curve();
 		}
@@ -323,8 +322,13 @@ class BezierCurve : public Curve {
 								+ (-3*t3 +3*t2) * _control_points[i*3+2][1]
 								+ (t3) * _control_points[i*3+3][1];
 
-					add_coordinate(x,y);
-				}
+					double z = (-t3 +3*t2 -3*t + 1) * _control_points[i*3+0][2] 
+								+ (3*t3 -6*t2 +3*t) * _control_points[i*3+1][2]
+								+ (-3*t3 +3*t2) * _control_points[i*3+2][2]
+								+ (t3) * _control_points[i*3+3][2];
+
+					add_coordinate(x,y,z);
+				}	 	  	 	     	  		  	  	    	      	 	
 			}
 		}
 	protected:
@@ -361,7 +365,7 @@ class BsplineCurve : public Curve {
 			double n23 = 2.0/3.0;
 
 
-			for (int i = 0; i < num_curves; i++) {
+			for (int i = 0; i < num_curves; i++) {	 	  	 	     	  		  	  	    	      	 	
 				auto c1 = _control_points[i];
 				auto c2 = _control_points[i+1];
 				auto c3 = _control_points[i+2];
@@ -385,10 +389,19 @@ class BsplineCurve : public Curve {
 				double delta_y3 = ay * (6 * t3);
 				double delta_y2 = delta_y3 +by * (2 * t2);
 
-				double vx = dx, vy = dy;
-				add_coordinate(vx, vy);
+				double az = -n16 * c1[2] +0.5 * c2[2] -0.5 * c3[2] +n16 * c4[2];
+				double bz =  0.5 * c1[2] 	   -c2[2] +0.5 * c3[2];
+				double cz = -0.5 * c1[2] 			  +0.5 * c3[2];
+				double dz =  n16 * c1[2] +n23 * c2[2] +n16 * c3[2];
+
+				double delta_z  = az * t3 + bz * t2 + cz * t;
+				double delta_z3 = az * (6 * t3);
+				double delta_z2 = delta_z3 +bz * (2 * t2);
+
+				double vx = dx, vy = dy, vz = dz;
+				add_coordinate(vx, vy, vz);
 				for (double t = 0.0; t < 1.0; t += _step) {
-					double x = vx, y = vy;
+					double x = vx, y = vy, z = vz;
 
 					x += delta_x;
 					delta_x += delta_x2;
@@ -398,14 +411,112 @@ class BsplineCurve : public Curve {
 					delta_y += delta_y2;
 					delta_y2 += delta_y3;
 
-					add_coordinate(x,y);
+					z += delta_z;
+					delta_z += delta_z2;
+					delta_z2 += delta_z3;
+
+					add_coordinate(x,y,z);
 					vx = x;
 					vy = y;
-				}
+					vz = z;
+				}	 	  	 	     	  		  	  	    	      	 	
 			}
 		}
 	protected:
 	private:
 };
 
+typedef std::vector<Polygon> face_list;
+
+class Object3D : public Object {
+	public:
+		Object3D(const std::string& name) :
+			Object(name)
+		{}
+
+		Object3D(const std::string& name, const face_list& faces) :
+			Object(name)
+		{
+			for (int i = 0; i < faces.size(); ++i) {
+			    _faces.push_back(faces[i]);   
+			}
+		}
+		virtual ~Object3D() {};
+	
+		virtual obj_type get_type() const {
+			return obj_type::OBJECT_3D;
+		}
+
+		virtual std::string get_type_name() const {
+			return "3D Object";
+		}
+
+		face_list& get_face_list() {
+			return this->_faces;
+		}
+
+		void insert_faces(const face_list& faces) {	 	  	 	     	  		  	  	    	      	 	
+			for (int i = 0; i < faces.size(); ++i) {
+			    _faces.push_back(faces[i]);   
+			}
+		}
+
+		Coordinate get_center_coord() const {
+			Coordinate sum(N);
+			int n = 0;
+			for (auto face : _faces) {
+				for (auto coord : face.get_coords()) {
+					sum += coord;
+				}
+				n += face.get_coords().size();
+			}
+			sum[0] /= n;
+			sum[1] /= n;
+			sum[2] /= n;
+			return sum;
+		}
+
+		Coordinate get_normalized_center_coord() const {
+			Coordinate sum(N);
+			int n = 0;
+			for (auto face : _faces) {
+				for (auto coord : face.get_normalized_coords())
+					sum += coord;
+				n += face.get_normalized_coords().size();
+			}
+			sum[0] /= n;
+			sum[1] /= n;
+			sum[2] /= n;
+			return sum;
+		}
+
+		void transform_coords(const Transformation& t) {
+			Matrix m = t.get_transformation_matrix();
+
+			for (auto &face : _faces) {	 	  	 	     	  		  	  	    	      	 	
+				for (auto &coord : face.get_coords()) {
+					coord.transform(m);
+				}
+			}
+		}
+
+		void set_normalized_coords(const Transformation& t) {
+			Matrix m = t.get_transformation_matrix();
+
+			for (auto &face : _faces) {
+				auto &coords = face.get_normalized_coords();
+				if (coords.size() > 0)
+					coords.clear();
+				for (auto coord : face.get_coords()) {
+				    coord.transform(m);
+					coords.push_back(coord);
+				}
+			}
+		}
+	protected:
+	private:
+		face_list _faces;
+};
+
 #endif
+	 	  	 	     	  		  	  	    	      	 	

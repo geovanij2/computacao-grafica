@@ -22,7 +22,10 @@ class Viewport {
 		void zoom(double step);
 		void moveX(double value);
 		void moveY(double value);
-		void rotate_window(double degrees);
+		void moveZ(double value);
+		void rotate_window_on_x(double degrees);
+		void rotate_window_on_y(double degrees);
+		void rotate_window_on_z(double degrees);
 
 		void drawDisplayFile(cairo_t* cr);
 		void addObject(Object* obj) { _objetos.adiciona(obj); normalize_and_clip_obj(obj); };
@@ -31,7 +34,7 @@ class Viewport {
 		Coordinates transformOneCoordinates(const Coordinates& coords) const;
 		void normalize_obj(Object* obj);
 		void normalize_and_clip_obj(Object* obj);
-    void changeLineClipAlg(const Line_clip_algs alg){_clipper.set_line_clip_alg(alg); normalize_and_clip_all_objs();}
+		void changeLineClipAlg(const Line_clip_algs alg){_clipper.set_line_clip_alg(alg); normalize_and_clip_all_objs();}	 	  	 	     	  		  	  	    	      	 	
 
 	protected:
 	private:
@@ -47,6 +50,7 @@ class Viewport {
 		void drawLine(Object* objeto, cairo_t* cr);
 		void drawPolygon(Object* objeto, cairo_t* cr);
 		void drawCurve(Object* obj, cairo_t* cr);
+		void drawObj3D(Object3D* obj, cairo_t* cr);
 
 };
 
@@ -65,8 +69,18 @@ void Viewport::moveY(double step){
 	normalize_and_clip_all_objs();
 }
 
-void Viewport::rotate_window(double degrees) {
-	_window->rotate(degrees);
+void Viewport::rotate_window_on_x(double degrees) {
+	_window->rotate_x(degrees);
+	normalize_and_clip_all_objs();
+}	 	  	 	     	  		  	  	    	      	 	
+
+void Viewport::rotate_window_on_y(double degrees) {
+	_window->rotate_y(degrees);
+	normalize_and_clip_all_objs();
+}
+
+void Viewport::rotate_window_on_z(double degrees) {
+	_window->rotate_z(degrees);
 	normalize_and_clip_all_objs();
 }
 
@@ -95,7 +109,7 @@ void Viewport::normalize_obj(Object* obj) {
 	obj->set_normalized_coords(t);
 }
 
-void Viewport::normalize_all_objs() {
+void Viewport::normalize_all_objs() {	 	  	 	     	  		  	  	    	      	 	
 	_window->update_transformation();
 	auto t = _window->get_transformation();
 
@@ -131,7 +145,7 @@ void Viewport::drawPoint(Object* objeto, cairo_t* cr) {
 	cairo_move_to(cr, coord[0]+10, coord[1]+10);
 	cairo_arc(cr, coord[0]+10, coord[1]+10, 1.0, 0.0, (2*G_PI) );
 	cairo_fill(cr);
-}
+}	 	  	 	     	  		  	  	    	      	 	
 
 void Viewport::drawLine(Object* objeto, cairo_t* cr) {
 	Coordinates transformed_vector = transformOneCoordinates(objeto->get_normalized_coords());
@@ -168,6 +182,13 @@ void Viewport::drawCurve(Object* obj, cairo_t* cr) {
 
 }
 
+void Viewport::drawObj3D(Object3D* obj, cairo_t* cr) {	 	  	 	     	  		  	  	    	      	 	
+	for (auto &face : obj->get_face_list()) {
+		if (face.get_normalized_coords().size() > 0)
+			drawPolygon(&face, cr);
+	}
+}
+
 void Viewport::drawDisplayFile(cairo_t* cr) {
 	//percorrer o displayfile enviando os objetos para o respectivo draw
 	for (int i = 0; i < _objetos.tamanho(); ++i) {
@@ -188,6 +209,9 @@ void Viewport::drawDisplayFile(cairo_t* cr) {
 			case obj_type::BEZIER_CURVE:
 				drawCurve(obj, cr);
 				break;
+			case obj_type::OBJECT_3D:
+				drawObj3D((Object3D*) obj, cr);
+				break;
 			default:
 				break;
 		}
@@ -195,3 +219,4 @@ void Viewport::drawDisplayFile(cairo_t* cr) {
 }
 
 #endif
+	 	  	 	     	  		  	  	    	      	 	

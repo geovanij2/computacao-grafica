@@ -35,7 +35,7 @@ GtkEntry* angle_entry;
 GtkToggleButton *LB_Clipping,*CS_Clipping;
 
 //Enum para TreeView
-enum {
+enum {	 	  	 	     	  		  	  	    	      	 	
   COL_ID = 0,
   COL_NAME,
   COL_TYPE,
@@ -107,7 +107,7 @@ int get_index_selected();
 /* CALLBACKS */
 
 /* MAIN_W */
-void on_zoom_in_button_clicked (GtkWidget *widget, gpointer data) {
+void on_zoom_in_button_clicked (GtkWidget *widget, gpointer data) {	 	  	 	     	  		  	  	    	      	 	
 	double step = atof(gtk_entry_get_text(step_entry));
 	viewport->zoom(step);
 }
@@ -139,13 +139,13 @@ void on_right_button_clicked (GtkWidget *widget, gpointer data) {
 
 void on_rotate_right_clicked (GtkWidget *widget, gpointer data) {
 	double angle = atof(gtk_entry_get_text(angle_entry));
-	viewport->rotate_window(-angle);
+	viewport->rotate_window_on_y(-angle);
 }
 
 void on_rotate_left_clicked (GtkWidget *widget, gpointer data) {
 	double angle = atof(gtk_entry_get_text(angle_entry));
-	viewport->rotate_window(angle);
-}
+	viewport->rotate_window_on_y(angle);
+}	 	  	 	     	  		  	  	    	      	 	
 
 void on_add_object_button_clicked (GtkWidget *widget, gpointer data) {
 	gtk_widget_show (GTK_WIDGET(add_geometric_shape_w));
@@ -186,13 +186,28 @@ void on_add_point_clicked (GtkWidget *widget, gpointer data) {
 	double y1 = atof(gtk_entry_get_text(y1_point_entry));
 
 	fill_treeview(name,"Point");
-	Point* point = new Point(name, x1, y1);
+	Point* point = new Point(name, x1, y1, 0);
 	viewport->addObject(point);
+	
+	Coordinate a(100,100,0);
+	Coordinate b(100,400,0);
+	Coordinate c(100,400,100);
+	Coordinate d(100,100,100);
+
+	
+	polygon_coords.push_back(a);
+	polygon_coords.push_back(b);
+	polygon_coords.push_back(c);
+	polygon_coords.push_back(d);
+	
+	Polygon* polygon = new Polygon(name, polygon_coords, false);
+	viewport->addObject(polygon);
+	polygon_coords.clear();
 
   gtk_entry_set_text(name_point_entry,"");
   gtk_entry_set_text(x1_point_entry,"");
   gtk_entry_set_text(y1_point_entry,"");
-}
+}	 	  	 	     	  		  	  	    	      	 	
 
 /* ADD_LINE_W */
 void on_add_line_clicked (GtkWidget *widget, gpointer data) {
@@ -203,7 +218,7 @@ void on_add_line_clicked (GtkWidget *widget, gpointer data) {
 	double y2 = atof(gtk_entry_get_text(y2_line_entry));
 
 	fill_treeview(name,"Line");
-	Line* line = new Line(name, x1, y1, x2, y2);
+	Line* line = new Line(name, x1, y1, 0, x2, y2, 0);
 	viewport->addObject(line);
   gtk_entry_set_text(name_line_entry,"");
   gtk_entry_set_text(x1_line_entry,"");
@@ -229,7 +244,7 @@ void on_add_poly_clicked (GtkWidget *widget, gpointer data) {
 	viewport->addObject(polygon);
 	polygon_coords.clear();
   gtk_entry_set_text(name_poly_entry, "");
-}
+}	 	  	 	     	  		  	  	    	      	 	
 /* ADD CURVE */
 void on_add_point_curve_clicked (GtkWidget *widget, gpointer data) {
   double x1 = atof(gtk_entry_get_text(x_curve_entry));
@@ -265,12 +280,12 @@ void on_add_curve_clicked (GtkWidget *widget, gpointer data) {
   gtk_entry_set_text(x_curve_entry, "");
   gtk_entry_set_text(y_curve_entry, "");
   gtk_entry_set_text(name_curve_entry, "");
-}
+}	 	  	 	     	  		  	  	    	      	 	
 
 /* Buttons Change object */
 void on_angle_world_button_clicked (GtkWidget *widget, gpointer data) {
 	double angle = atof(gtk_entry_get_text(angle_world_entry));
-	accumulator.push_back(Transformation::generate_2D_rotation_around_point(angle, Coordinate(0,0)));
+	accumulator.push_back(Transformation::generate_ra(angle, Coordinate(0,0)));
 }
 
 void on_angle_obj_button_clicked(GtkWidget *widget, gpointer data) {
@@ -278,38 +293,39 @@ void on_angle_obj_button_clicked(GtkWidget *widget, gpointer data) {
 	Coordinate center = (viewport->getObject(index))->get_center_coord();
 
 	double angle = atof(gtk_entry_get_text(angle_obj_entry));
-	accumulator.push_back(Transformation::generate_2D_rotation_around_point(angle, center));
+	accumulator.push_back(Transformation::generate_full_rotation(0,0,angle,0,center));
 
 }
 
 void on_translate_button_clicked (GtkWidget *widget, gpointer data) {
 	double dx = atof(gtk_entry_get_text(trans_x_entry));
 	double dy = atof(gtk_entry_get_text(trans_y_entry));
-	accumulator.push_back(Transformation::generate_2D_translation_matrix(dx, dy));
+	accumulator.push_back(Transformation::generate_translation_matrix(dx, dy, 0));
 }
 
 void on_rotate_point_button_clicked (GtkWidget *widget, gpointer data) {
 	double angle = atof(gtk_entry_get_text(angle_point_entry));
 	double x = atof(gtk_entry_get_text(angle_pointx_entry));
 	double y = atof(gtk_entry_get_text(angle_pointy_entry));
-	accumulator.push_back(Transformation::generate_2D_rotation_around_point(angle, Coordinate(x,y)));
+	accumulator.push_back(Transformation::generate_rz(angle));
 
 }
-
+//ok
 void on_schedule_button_clicked (GtkWidget *widget, gpointer data) {
 	double sx = atof(gtk_entry_get_text(sx_entry));
 	double sy = atof(gtk_entry_get_text(sy_entry));
 
 	int index = get_index_selected();
 	Coordinate center = (viewport->getObject(index))->get_center_coord();
-	accumulator.push_back(Transformation::generate_2D_scaling_around_obj_center_matrix(sx, sy, center));
-}
+	accumulator.push_back(Transformation::generate_scaling_around_obj_center_matrix(sx, sy, 0, center));
+}	 	  	 	     	  		  	  	    	      	 	
 void on_change_obj_button_clicked (GtkWidget *widget, gpointer data) {
 	//std::string name = get_name_selected();
 	//aqui será onde será feita a multiplicação da matriz final no objeto com nome name
-	Matrix identity = { {1, 0, 0},
-	         			{0, 1, 0},
-	         			{0, 0, 1} };
+	Matrix identity = { {1, 0, 0, 0},
+	         			{0, 1, 0, 0},
+	         			{0, 0, 1, 0},
+	         			{0, 0, 0, 1} };
 	Transformation id = Transformation(identity);
 	for(int i=0; i < accumulator.size(); i++){
 		id *= accumulator.at(i);
@@ -346,7 +362,7 @@ gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) {
 
 	gtk_widget_queue_draw(draw_viewport);
 	return FALSE;
-}
+}	 	  	 	     	  		  	  	    	      	 	
 
 int get_index_selected() {
 	GtkTreeIter iter;
@@ -397,7 +413,7 @@ void create_treeview (void) {
 	gtk_tree_selection_set_mode(objects_select, GTK_SELECTION_SINGLE);
 
 	g_object_unref (model);
-}
+}	 	  	 	     	  		  	  	    	      	 	
 
 int main (int argc, char *argv[]) {
 	GtkBuilder *builder;
@@ -563,4 +579,4 @@ int main (int argc, char *argv[]) {
 	gtk_main ();
 
 	return 0;
-}
+}	 	  	 	     	  		  	  	    	      	 	

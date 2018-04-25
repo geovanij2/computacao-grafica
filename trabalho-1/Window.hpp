@@ -1,7 +1,6 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-
 #include <cmath>
 #include "coordinate.hpp"
 #include "Transformation.hpp"
@@ -10,33 +9,52 @@ class Window {
 	public:
 		Window(double width, double height):
 			_center(width/2, height/2),
-			_angle(0),
 			_width(width),
 			_heigth(height),
-			_t({ {1, 0, 0},
-				 {0, 1, 0},
-				 {0, 0, 1} })
+			_t({ {1, 0, 0, 0},
+				 {0, 1, 0, 0},
+				 {0, 0, 1, 0},
+				 {0, 0, 0, 1} })
 		{}
 		
-		virtual ~Window() {} 
+		virtual ~Window() {}
+
+		double get_width() { return _width; }
+		double get_height() { return _heigth; }
+
+		double get_angle_x() { return _angle_x; }
+		double get_angle_y() { return _angle_y; }
+		double get_angle_z() { return _angle_z; }
+
+		void rotate_x(double degrees) { _angle_x += degrees; }
+		void rotate_y(double degrees) { _angle_y += degrees; }
+		void rotate_z(double degrees) { _angle_z += degrees; }
 
 		void zoom(double step);
+
 		void moveX(double value);
 		void moveY(double value);
-		void rotate(double degrees);
+		void moveZ(double value);
 
-		Coordinate lowmin() const { return Coordinate(-1,-1); }
+
+		Coordinate lowmin() const { return Coordinate(-1,-1); }	 	  	 	     	  		  	  	    	      	 	
 		Coordinate uppermax() const { return Coordinate(1,1); }
 		Coordinate center() const { return _center; }
-		double angle() const { return _angle; }
 
 		Transformation& get_transformation() { return _t; }
 		void update_transformation();
 
 	protected:
 	private:
+		void move(double x, double y, double z) {
+			Coordinate c(x,y,z);
+			auto t = Transformation::generate_rotation_matrix(_angle_x, _angle_y, _angle_z);
+			c.transform(t.get_transformation_matrix());
+			_center += c;
+		}
+
 		Coordinate _center;
-		double _angle; // radians
+		double _angle_x = 0, _angle_y = 0, _angle_z = 0; // radians
 		double _width, _heigth;
 		Transformation _t;
 };
@@ -49,31 +67,26 @@ void Window::zoom(double step) {
 
 /* Move Window Horizontally */
 void Window::moveX(double value) {
-	double teta = Transformation::to_radians(_angle+90);
-	Coordinate coord(sin(teta)*value, -cos(teta)*value);
-
-	_center += coord;
+	move(value, 0, 0);
 }
 
 /* Move Window Vertically */
 void Window::moveY(double value) {
-	double teta = Transformation::to_radians(_angle+90);
-	Coordinate coord(cos(teta)*value, sin(teta)*value);
+	move(0, value, 0);
+}	 	  	 	     	  		  	  	    	      	 	
 
-	_center += coord;
-}
-
-void Window::rotate(double degrees) {
-	_angle += degrees;
+void Window::moveZ(double value) {
+	move(0, 0, value);
 }
 
 void Window::update_transformation() {
-	_t = Transformation({ {1, 0, 0},
-						  {0, 1, 0},
-						  {0, 0, 1} });
-	_t *= Transformation::generate_2D_translation_matrix(-_center[0], -_center[1]);
-	_t *= Transformation::generate_2D_rotation_matrix(-_angle);
-	_t *= Transformation::generate_2D_scaling_matrix(1/(_width/2), 1/(_heigth/2));
+	_t = Transformation({ {1, 0, 0, 0},
+						  {0, 1, 0, 0},
+						  {0, 0, 1, 0},
+						  {0, 0, 0, 1} });
+	_t *= Transformation::generate_translation_matrix(-_center[0], -_center[1], -_center[2]);
+	_t *= Transformation::generate_rotation_matrix(-_angle_x, _angle_y, -_angle_z);
+	_t *= Transformation::generate_scaling_matrix(1/(_width/2), 1/(_heigth/2), 4.0/(_width + _heigth));
 }
 
 #endif

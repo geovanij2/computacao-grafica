@@ -37,7 +37,7 @@ private:
 };
 
 template<typename T>
-ListaEnc<T>::ListaEnc() {
+ListaEnc<T>::ListaEnc() {	 	  	 	     	  		  	  	    	      	 	
 	this->head = nullptr;
 	this->size = 0;
 }
@@ -76,7 +76,7 @@ void ListaEnc<T>::eliminaDoInicio() {
 	this->head = inicio->getProximo();
 	this->size--;
 	delete inicio;
-}
+}	 	  	 	     	  		  	  	    	      	 	
 
 //posicao
 template<typename T>
@@ -114,7 +114,7 @@ int ListaEnc<T>::posicao(const T& dado) const {
 }
 
 template<typename T>
-T* ListaEnc<T>::posicaoMem(const T& dado) const {
+T* ListaEnc<T>::posicaoMem(const T& dado) const {	 	  	 	     	  		  	  	    	      	 	
 	if (this->listaVazia()) {
 		throw std::out_of_range("lista vazia");
 	}
@@ -156,7 +156,7 @@ T ListaEnc<T>::retiraDaPosicao(int pos) {
 		this->size--;
 		delete elimina;
 		return dado;
-	}
+	}	 	  	 	     	  		  	  	    	      	 	
 }
 
 template<typename T>
@@ -193,7 +193,7 @@ T ListaEnc<T>::retiraEspecifico(const T& dado) {
 }
 
 template<typename T>
-void ListaEnc<T>::adicionaEmOrdem(const T& dado) {
+void ListaEnc<T>::adicionaEmOrdem(const T& dado) {	 	  	 	     	  		  	  	    	      	 	
 	if (this->listaVazia())
 		return this->adicionaNoInicio(dado);
 	Elemento<T>* atual = this->head;
@@ -230,7 +230,7 @@ bool ListaEnc<T>::menor(T dado1, T dado2) {
 }
 
 template<typename T>
-void ListaEnc<T>::destroiLista() {
+void ListaEnc<T>::destroiLista() {	 	  	 	     	  		  	  	    	      	 	
 	Elemento<T> *atual, *anterior;
 	atual = this->head;
 	for (int i = 0; i < this->size; i++) {

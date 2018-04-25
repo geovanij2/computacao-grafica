@@ -10,21 +10,13 @@ typedef std::vector<std::vector<double>> Matrix;
 
 class Coordinate: public std::vector<double> {
 	public:
- 		Coordinate(int n) {
- 			if (n < 2 || n > 3)
- 				throw std::out_of_range("Coodinate must be 2 or 3 dimensional");
- 			for (int i = 0; i < n; i++)
+ 		Coordinate(int n=3) {
+ 			for (int i = 0; i < 3; i++)
  				this->push_back(0);
  			this->push_back(1);
  		}
 
- 		Coordinate(double x, double y) {
- 			this->push_back(x);
- 			this->push_back(y);
- 			this->push_back(1);
- 		}
-
- 		Coordinate(double x, double y, double z) {
+ 		Coordinate(double x, double y, double z = 0) {
  			this->push_back(x);
  			this->push_back(y);
  			this->push_back(z);
@@ -42,7 +34,7 @@ class Coordinate: public std::vector<double> {
  					sum += this->at(j) * m[j][i];
  				}
  				res.push_back(sum);
- 			}
+ 			}	 	  	 	     	  		  	  	    	      	 	
  			for (int i = 0; i < res.size(); ++i)
  				this->at(i) = res[i];
  		}
@@ -79,7 +71,7 @@ class Coordinate: public std::vector<double> {
 			for (int i = 0; i < this->size(); ++i) {
 				if (this->at(i) != other[i])
 					return false;
-			}
+			}	 	  	 	     	  		  	  	    	      	 	
 			return true;
 		};
 
