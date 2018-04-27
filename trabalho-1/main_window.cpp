@@ -109,6 +109,7 @@ GtkButton* translate_button;
 GtkButton* rotate_point_button;
 GtkButton* schedule_button;
 GtkButton* change_obj_button;
+GtkToggleButton *x_checkr,*y_checkr,*z_checkr;
 
 void fill_treeview(const char* name,const char* type);
 int get_index_selected();
@@ -302,15 +303,30 @@ void on_add_curve_clicked (GtkWidget *widget, gpointer data) {
 /* Buttons Change object */
 void on_angle_world_button_clicked (GtkWidget *widget, gpointer data) {
 	double angle = atof(gtk_entry_get_text(angle_world_entry));
-	accumulator.push_back(Transformation::generate_ra(angle, Coordinate(0,0)));
+	if (gtk_toggle_button_get_active(x_checkr)) {
+	    accumulator.push_back(Transformation::generate_rx(angle,false));
+	} else if (gtk_toggle_button_get_active(y_checkr)) {
+	    accumulator.push_back(Transformation::generate_ry(angle,false));
+	} else if (gtk_toggle_button_get_active(z_checkr)) {
+	    accumulator.push_back(Transformation::generate_rz(angle,false));
+	}
 }
 
 void on_angle_obj_button_clicked(GtkWidget *widget, gpointer data) {
 	int index = get_index_selected();
 	Coordinate center = (viewport->getObject(index))->get_center_coord();
-
 	double angle = atof(gtk_entry_get_text(angle_obj_entry));
-	accumulator.push_back(Transformation::generate_full_rotation(0,0,angle,0,center));
+	
+	//accumulator.push_back(Transformation::generate_full_rotation(0,0,angle,0,center));
+	accumulator.push_back(Transformation::generate_translation_matrix(-center[0], -center[1], -center[2]));
+	if (gtk_toggle_button_get_active(x_checkr)) {
+	    accumulator.push_back(Transformation::generate_rx(angle,false));
+	} else if (gtk_toggle_button_get_active(y_checkr)) {
+	    accumulator.push_back(Transformation::generate_ry(angle,false));
+	} else if (gtk_toggle_button_get_active(z_checkr)) {
+	    accumulator.push_back(Transformation::generate_rz(angle,false));
+	}
+	accumulator.push_back(Transformation::generate_translation_matrix(center[0], center[1], center[2]));
 
 }
 
@@ -430,6 +446,27 @@ void check_z() {
     if (gtk_toggle_button_get_active(z_check)) {
         gtk_toggle_button_set_active(x_check, false);
         gtk_toggle_button_set_active(y_check, false);
+    }
+}
+
+void check_xr() {
+    if (gtk_toggle_button_get_active(x_checkr)) {
+        gtk_toggle_button_set_active(y_checkr, false);
+        gtk_toggle_button_set_active(z_checkr, false);
+    }
+}
+
+void check_yr() {
+    if (gtk_toggle_button_get_active(y_checkr)) {
+        gtk_toggle_button_set_active(x_checkr, false);
+        gtk_toggle_button_set_active(z_checkr, false);  
+    }
+}
+
+void check_zr() {
+    if (gtk_toggle_button_get_active(z_checkr)) {
+        gtk_toggle_button_set_active(x_checkr, false);
+        gtk_toggle_button_set_active(y_checkr, false);
     }
 }
         
@@ -626,9 +663,15 @@ int main (int argc, char *argv[]) {
     x_check = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"x_check"));
     y_check = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"y_check"));
     z_check = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"z_check"));
+    x_checkr = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"x_checkr"));
+    y_checkr = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"y_checkr"));
+    z_checkr = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"z_checkr"));
     g_signal_connect(x_check, "toggled", G_CALLBACK(check_x), NULL);
     g_signal_connect(y_check, "toggled", G_CALLBACK(check_y), NULL);
     g_signal_connect(z_check, "toggled", G_CALLBACK(check_z), NULL);
+    g_signal_connect(x_checkr, "toggled", G_CALLBACK(check_xr), NULL);
+    g_signal_connect(y_checkr, "toggled", G_CALLBACK(check_yr), NULL);
+    g_signal_connect(z_checkr, "toggled", G_CALLBACK(check_zr), NULL);
 
 	gtk_widget_show(GTK_WIDGET(main_w));
 
