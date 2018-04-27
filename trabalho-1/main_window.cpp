@@ -33,6 +33,7 @@ GtkButton* rotate_right;
 GtkEntry* step_entry;
 GtkEntry* angle_entry;
 GtkToggleButton *LB_Clipping,*CS_Clipping;
+GtkToggleButton *x_check,*y_check,*z_check;
 
 //Enum para TreeView
 enum {	 	  	 	     	  		  	  	    	      	 	
@@ -56,20 +57,24 @@ GObject* add_point_w;
 GtkEntry* name_point_entry;
 GtkEntry* x1_point_entry;
 GtkEntry* y1_point_entry;
+GtkEntry* z1_point_entry;
 GtkButton* add_point;
 
 GObject* add_line_w;
 GtkEntry* name_line_entry;
 GtkEntry* x1_line_entry;
 GtkEntry* y1_line_entry;
+GtkEntry* z1_line_entry;
 GtkEntry* x2_line_entry;
 GtkEntry* y2_line_entry;
+GtkEntry* z2_line_entry;
 GtkButton* add_line;
 
 GObject* add_poly_w;
 GtkEntry* name_poly_entry;
 GtkEntry* x_poly_entry;
 GtkEntry* y_poly_entry;
+GtkEntry* z_poly_entry;
 GtkButton* add_point_poly;
 GtkButton* add_poly;
 GtkToggleButton* filled;
@@ -78,6 +83,7 @@ GObject* add_curve_w;
 GtkEntry* name_curve_entry;
 GtkEntry* x_curve_entry;
 GtkEntry* y_curve_entry;
+GtkEntry* z_curve_entry;
 GtkButton* add_point_curve;
 GtkButton* add_curve;
 GtkLabel* label_number_points;
@@ -89,11 +95,14 @@ GtkEntry* angle_world_entry;
 GtkEntry* angle_obj_entry;
 GtkEntry* trans_y_entry;
 GtkEntry* trans_x_entry;
+GtkEntry* trans_z_entry;
 GtkEntry* angle_point_entry;
 GtkEntry* angle_pointx_entry;
 GtkEntry* angle_pointy_entry;
+GtkEntry* angle_pointz_entry;
 GtkEntry* sx_entry;
 GtkEntry* sy_entry;
+GtkEntry* sz_entry;
 GtkButton* angle_world_button;
 GtkButton* angle_obj_button;
 GtkButton* translate_button;
@@ -139,12 +148,24 @@ void on_right_button_clicked (GtkWidget *widget, gpointer data) {
 
 void on_rotate_right_clicked (GtkWidget *widget, gpointer data) {
 	double angle = atof(gtk_entry_get_text(angle_entry));
-	viewport->rotate_window_on_y(-angle);
+	if (gtk_toggle_button_get_active(x_check)) {
+	    viewport->rotate_window_on_x(-angle);
+	} else if (gtk_toggle_button_get_active(y_check)) {
+	    viewport->rotate_window_on_y(-angle);
+	} else if (gtk_toggle_button_get_active(z_check)) {
+	    viewport->rotate_window_on_z(-angle);
+	}
 }
 
 void on_rotate_left_clicked (GtkWidget *widget, gpointer data) {
 	double angle = atof(gtk_entry_get_text(angle_entry));
-	viewport->rotate_window_on_y(angle);
+	if (gtk_toggle_button_get_active(x_check)) {
+	    viewport->rotate_window_on_x(angle);
+	} else if (gtk_toggle_button_get_active(y_check)) {
+	    viewport->rotate_window_on_y(angle);
+	} else if (gtk_toggle_button_get_active(z_check)){
+	    viewport->rotate_window_on_z(angle);
+	}
 }	 	  	 	     	  		  	  	    	      	 	
 
 void on_add_object_button_clicked (GtkWidget *widget, gpointer data) {
@@ -175,7 +196,7 @@ void on_add_poly1_clicked (GtkWidget *widget, gpointer data) {
 }
 
 void on_add_curve1_clicked (GtkWidget *widget, gpointer data) {
-  gtk_widget_show (GTK_WIDGET(add_curve_w));
+    gtk_widget_show (GTK_WIDGET(add_curve_w));
 }
 
 
@@ -184,29 +205,16 @@ void on_add_point_clicked (GtkWidget *widget, gpointer data) {
 	const gchar* name = gtk_entry_get_text(name_point_entry);
 	double x1 = atof(gtk_entry_get_text(x1_point_entry));
 	double y1 = atof(gtk_entry_get_text(y1_point_entry));
+	double z1 = atof(gtk_entry_get_text(z1_point_entry));
 
 	fill_treeview(name,"Point");
-	Point* point = new Point(name, x1, y1, 0);
+	Point* point = new Point(name, x1, y1, z1);
 	viewport->addObject(point);
-	
-	Coordinate a(100,100,0);
-	Coordinate b(100,400,0);
-	Coordinate c(100,400,100);
-	Coordinate d(100,100,100);
 
-	
-	polygon_coords.push_back(a);
-	polygon_coords.push_back(b);
-	polygon_coords.push_back(c);
-	polygon_coords.push_back(d);
-	
-	Polygon* polygon = new Polygon(name, polygon_coords, false);
-	viewport->addObject(polygon);
-	polygon_coords.clear();
-
-  gtk_entry_set_text(name_point_entry,"");
-  gtk_entry_set_text(x1_point_entry,"");
-  gtk_entry_set_text(y1_point_entry,"");
+    gtk_entry_set_text(name_point_entry,"");
+    gtk_entry_set_text(x1_point_entry,"");
+    gtk_entry_set_text(y1_point_entry,"");
+    gtk_entry_set_text(z1_point_entry,"");
 }	 	  	 	     	  		  	  	    	      	 	
 
 /* ADD_LINE_W */
@@ -214,17 +222,21 @@ void on_add_line_clicked (GtkWidget *widget, gpointer data) {
 	const gchar* name = gtk_entry_get_text(name_line_entry);
 	double x1 = atof(gtk_entry_get_text(x1_line_entry));
 	double y1 = atof(gtk_entry_get_text(y1_line_entry));
+	double z1 = atof(gtk_entry_get_text(z1_line_entry));
 	double x2 = atof(gtk_entry_get_text(x2_line_entry));
 	double y2 = atof(gtk_entry_get_text(y2_line_entry));
-
+	double z2 = atof(gtk_entry_get_text(z2_line_entry));
+	
 	fill_treeview(name,"Line");
-	Line* line = new Line(name, x1, y1, 0, x2, y2, 0);
+	Line* line = new Line(name, x1, y1, z1, x2, y2, z2);
 	viewport->addObject(line);
-  gtk_entry_set_text(name_line_entry,"");
-  gtk_entry_set_text(x1_line_entry,"");
-  gtk_entry_set_text(x2_line_entry,"");
-  gtk_entry_set_text(y1_line_entry,"");
-  gtk_entry_set_text(y2_line_entry,"");  
+    gtk_entry_set_text(name_line_entry,"");
+    gtk_entry_set_text(x1_line_entry,"");
+    gtk_entry_set_text(x2_line_entry,"");
+    gtk_entry_set_text(y1_line_entry,"");
+    gtk_entry_set_text(y2_line_entry,"");  
+    gtk_entry_set_text(z1_line_entry,"");
+    gtk_entry_set_text(z2_line_entry,"");  
 
 }
 
@@ -232,9 +244,11 @@ void on_add_line_clicked (GtkWidget *widget, gpointer data) {
 void on_add_point_poly_clicked (GtkWidget *widget, gpointer data) {
 	double x1 = atof(gtk_entry_get_text(x_poly_entry));
 	double y1 = atof(gtk_entry_get_text(y_poly_entry));
-	polygon_coords.push_back(Coordinate(x1,y1));
-  gtk_entry_set_text(x_poly_entry,"");
-  gtk_entry_set_text(y_poly_entry,"");
+	double z1 = atof(gtk_entry_get_text(z_poly_entry));
+	polygon_coords.push_back(Coordinate(x1,y1,z1));
+    gtk_entry_set_text(x_poly_entry,"");
+    gtk_entry_set_text(y_poly_entry,"");
+    gtk_entry_set_text(z_poly_entry,"");
 }
 
 void on_add_poly_clicked (GtkWidget *widget, gpointer data) {
@@ -243,43 +257,46 @@ void on_add_poly_clicked (GtkWidget *widget, gpointer data) {
 	Polygon* polygon = new Polygon(name, polygon_coords, gtk_toggle_button_get_active(filled));
 	viewport->addObject(polygon);
 	polygon_coords.clear();
-  gtk_entry_set_text(name_poly_entry, "");
+    gtk_entry_set_text(name_poly_entry, "");
 }	 	  	 	     	  		  	  	    	      	 	
 /* ADD CURVE */
 void on_add_point_curve_clicked (GtkWidget *widget, gpointer data) {
-  double x1 = atof(gtk_entry_get_text(x_curve_entry));
-  double y1 = atof(gtk_entry_get_text(y_curve_entry));
-  curve_coords.push_back(Coordinate(x1,y1));
-  int n = atoi(gtk_label_get_text(label_number_points));
-  //char* s;
-  //itoa(++n, s, 10);
-  char buf[10];
-  sprintf(buf, "  %d  ", ++n);
+    double x1 = atof(gtk_entry_get_text(x_curve_entry));
+    double y1 = atof(gtk_entry_get_text(y_curve_entry));
+    double z1 = atof(gtk_entry_get_text(z_curve_entry));
+    curve_coords.push_back(Coordinate(x1,y1,z1));
+    int n = atoi(gtk_label_get_text(label_number_points));
+    //char* s;
+    //itoa(++n, s, 10);
+    char buf[10];
+    sprintf(buf, "  %d  ", ++n);
 
-  gtk_label_set_text(label_number_points, buf);
-  gtk_entry_set_text(x_curve_entry, "");
-  gtk_entry_set_text(y_curve_entry, "");
+    gtk_label_set_text(label_number_points, buf);
+    gtk_entry_set_text(x_curve_entry, "");
+    gtk_entry_set_text(y_curve_entry, "");
+    gtk_entry_set_text(z_curve_entry, "");
 }
 
 void on_add_curve_clicked (GtkWidget *widget, gpointer data) {
   const gchar* name = gtk_entry_get_text(name_curve_entry);
   if (gtk_toggle_button_get_active(bspline_check)){
-    fill_treeview(name,"B-Spline Curve");
-    BsplineCurve* curve = new BsplineCurve(name, curve_coords);
-    viewport->addObject(curve);
-    curve_coords.clear();
+        fill_treeview(name,"B-Spline Curve");
+        BsplineCurve* curve = new BsplineCurve(name, curve_coords);
+        viewport->addObject(curve);
+        curve_coords.clear();
   } else {
-    fill_treeview(name,"Bezier Curve");
-    BezierCurve* curve = new BezierCurve(name, curve_coords);
-    viewport->addObject(curve);
-    curve_coords.clear();
+        fill_treeview(name,"Bezier Curve");
+        BezierCurve* curve = new BezierCurve(name, curve_coords);
+        viewport->addObject(curve);
+        curve_coords.clear();
   }
  
   
-  gtk_label_set_text(label_number_points, "  0  ");
-  gtk_entry_set_text(x_curve_entry, "");
-  gtk_entry_set_text(y_curve_entry, "");
-  gtk_entry_set_text(name_curve_entry, "");
+    gtk_label_set_text(label_number_points, "  0  ");
+    gtk_entry_set_text(x_curve_entry, "");
+    gtk_entry_set_text(y_curve_entry, "");
+    gtk_entry_set_text(z_curve_entry, "");
+    gtk_entry_set_text(name_curve_entry, "");
 }	 	  	 	     	  		  	  	    	      	 	
 
 /* Buttons Change object */
@@ -300,13 +317,15 @@ void on_angle_obj_button_clicked(GtkWidget *widget, gpointer data) {
 void on_translate_button_clicked (GtkWidget *widget, gpointer data) {
 	double dx = atof(gtk_entry_get_text(trans_x_entry));
 	double dy = atof(gtk_entry_get_text(trans_y_entry));
-	accumulator.push_back(Transformation::generate_translation_matrix(dx, dy, 0));
+	double dz = atof(gtk_entry_get_text(trans_z_entry));
+	accumulator.push_back(Transformation::generate_translation_matrix(dx, dy, dz));
 }
 
 void on_rotate_point_button_clicked (GtkWidget *widget, gpointer data) {
 	double angle = atof(gtk_entry_get_text(angle_point_entry));
 	double x = atof(gtk_entry_get_text(angle_pointx_entry));
 	double y = atof(gtk_entry_get_text(angle_pointy_entry));
+	double z = atof(gtk_entry_get_text(angle_pointz_entry));
 	accumulator.push_back(Transformation::generate_rz(angle));
 
 }
@@ -314,10 +333,11 @@ void on_rotate_point_button_clicked (GtkWidget *widget, gpointer data) {
 void on_schedule_button_clicked (GtkWidget *widget, gpointer data) {
 	double sx = atof(gtk_entry_get_text(sx_entry));
 	double sy = atof(gtk_entry_get_text(sy_entry));
+	double sz = atof(gtk_entry_get_text(sz_entry));
 
 	int index = get_index_selected();
 	Coordinate center = (viewport->getObject(index))->get_center_coord();
-	accumulator.push_back(Transformation::generate_scaling_around_obj_center_matrix(sx, sy, 0, center));
+	accumulator.push_back(Transformation::generate_scaling_around_obj_center_matrix(sx, sy, sz, center));
 }	 	  	 	     	  		  	  	    	      	 	
 void on_change_obj_button_clicked (GtkWidget *widget, gpointer data) {
 	//std::string name = get_name_selected();
@@ -341,9 +361,9 @@ gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) {
 	cairo_set_source_rgb(cr, 1, 1, 1);
 	cairo_paint(cr);
 
-  //int width = gtk_widget_get_allocated_width (widget);
-  //int height = gtk_widget_get_allocated_height (widget);
-  //530x535
+    //int width = gtk_widget_get_allocated_width (widget);
+    //int height = gtk_widget_get_allocated_height (widget);
+    //530x535
     cairo_set_source_rgb(cr, 0, 0, 0);
     cairo_set_line_width(cr, 1.0);
 
@@ -382,15 +402,37 @@ void fill_treeview (const char* name, const char* type) {
 }
 
 void check() {
-  if (gtk_toggle_button_get_active(CS_Clipping)){
-    gtk_toggle_button_set_active(LB_Clipping, false);
-    viewport->changeLineClipAlg(Line_clip_algs::CS);
-  } else if(gtk_toggle_button_get_active(LB_Clipping)) {
-    gtk_toggle_button_set_active(CS_Clipping, false);
-    viewport->changeLineClipAlg(Line_clip_algs::LB);
-  } else 
-    viewport->changeLineClipAlg(Line_clip_algs::CS);
+    if (gtk_toggle_button_get_active(CS_Clipping)){
+        gtk_toggle_button_set_active(LB_Clipping, false);
+        viewport->changeLineClipAlg(Line_clip_algs::CS);
+    } else if(gtk_toggle_button_get_active(LB_Clipping)) {
+        gtk_toggle_button_set_active(CS_Clipping, false);
+        viewport->changeLineClipAlg(Line_clip_algs::LB);
+    } else 
+        viewport->changeLineClipAlg(Line_clip_algs::CS);
 }
+
+void check_x() {
+    if (gtk_toggle_button_get_active(x_check)) {
+        gtk_toggle_button_set_active(y_check, false);
+        gtk_toggle_button_set_active(z_check, false);
+    }
+}
+
+void check_y() {
+    if (gtk_toggle_button_get_active(y_check)) {
+        gtk_toggle_button_set_active(x_check, false);
+        gtk_toggle_button_set_active(z_check, false);  
+    }
+}
+
+void check_z() {
+    if (gtk_toggle_button_get_active(z_check)) {
+        gtk_toggle_button_set_active(x_check, false);
+        gtk_toggle_button_set_active(y_check, false);
+    }
+}
+        
 void create_treeview (void) {
 	GtkCellRenderer *renderer;
 	GtkTreeModel *model;
@@ -482,8 +524,8 @@ int main (int argc, char *argv[]) {
 	add_poly1 = GTK_BUTTON(gtk_builder_get_object(builder, "add_poly1"));
 	g_signal_connect (add_poly1, "clicked", G_CALLBACK (on_add_poly1_clicked), NULL);
 
-  add_curve1 = GTK_BUTTON(gtk_builder_get_object(builder, "add_curve1"));
-  g_signal_connect (add_curve1, "clicked", G_CALLBACK (on_add_curve1_clicked), NULL);
+    add_curve1 = GTK_BUTTON(gtk_builder_get_object(builder, "add_curve1"));
+    g_signal_connect (add_curve1, "clicked", G_CALLBACK (on_add_curve1_clicked), NULL);
 
 
 	/* Delete action windows*/
@@ -496,8 +538,8 @@ int main (int argc, char *argv[]) {
 	add_poly_w = gtk_builder_get_object (builder, "add_poly_w");
 	g_signal_connect (add_poly_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
 
-  add_curve_w = gtk_builder_get_object (builder, "add_curve_w");
-  g_signal_connect (add_curve_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
+    add_curve_w = gtk_builder_get_object (builder, "add_curve_w");
+    g_signal_connect (add_curve_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
 
 	/* Buttons point, line, poly and curve*/
 	add_point = GTK_BUTTON(gtk_builder_get_object(builder, "add_point"));
@@ -512,11 +554,11 @@ int main (int argc, char *argv[]) {
 	add_poly = GTK_BUTTON(gtk_builder_get_object(builder, "add_poly"));
 	g_signal_connect (add_poly, "clicked", G_CALLBACK (on_add_poly_clicked), NULL);
 
-  add_point_curve = GTK_BUTTON(gtk_builder_get_object(builder, "add_point_curve"));
-  g_signal_connect (add_point_curve, "clicked", G_CALLBACK (on_add_point_curve_clicked), NULL);
+    add_point_curve = GTK_BUTTON(gtk_builder_get_object(builder, "add_point_curve"));
+    g_signal_connect (add_point_curve, "clicked", G_CALLBACK (on_add_point_curve_clicked), NULL);
 
-  add_curve = GTK_BUTTON(gtk_builder_get_object(builder, "add_curve"));
-  g_signal_connect (add_curve, "clicked", G_CALLBACK (on_add_curve_clicked), NULL);
+    add_curve = GTK_BUTTON(gtk_builder_get_object(builder, "add_curve"));
+    g_signal_connect (add_curve, "clicked", G_CALLBACK (on_add_curve_clicked), NULL);
 
 	/* Buttons Change object */
 	change_obj_w = gtk_builder_get_object (builder, "change_obj_w");
@@ -546,33 +588,47 @@ int main (int argc, char *argv[]) {
 	name_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_point_entry"));
 	x1_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "x1_point_entry"));
 	y1_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "y1_point_entry"));
+	z1_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "z1_point_entry"));
 	name_line_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_line_entry"));
 	x1_line_entry = GTK_ENTRY(gtk_builder_get_object(builder, "x1_line_entry"));
 	y1_line_entry = GTK_ENTRY(gtk_builder_get_object(builder, "y1_line_entry"));
+	z1_line_entry = GTK_ENTRY(gtk_builder_get_object(builder, "z1_line_entry"));
 	x2_line_entry = GTK_ENTRY(gtk_builder_get_object(builder, "x2_line_entry"));
 	y2_line_entry = GTK_ENTRY(gtk_builder_get_object(builder, "y2_line_entry"));
+	z2_line_entry = GTK_ENTRY(gtk_builder_get_object(builder, "z2_line_entry"));
 	name_poly_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_poly_entry"));
 	x_poly_entry = GTK_ENTRY(gtk_builder_get_object(builder, "x_poly_entry"));
 	y_poly_entry = GTK_ENTRY(gtk_builder_get_object(builder, "y_poly_entry"));
+	z_poly_entry = GTK_ENTRY(gtk_builder_get_object(builder, "z_poly_entry"));
 	angle_world_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_world_entry"));
 	angle_obj_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_obj_entry"));
 	trans_x_entry = GTK_ENTRY(gtk_builder_get_object(builder, "trans_x_entry"));
 	trans_y_entry = GTK_ENTRY(gtk_builder_get_object(builder, "trans_y_entry"));
+	trans_z_entry = GTK_ENTRY(gtk_builder_get_object(builder, "trans_z_entry"));
 	angle_point_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_point_entry"));
 	angle_pointx_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_pointx_entry"));
 	angle_pointy_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_pointy_entry"));
+	angle_pointz_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_pointz_entry"));
 	sx_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sx_entry"));
 	sy_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sy_entry"));
-  filled = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"fill_poly_checkButton"));
-  CS_Clipping = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"CS_Clipping"));
-  LB_Clipping = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"LB_Clipping"));
-  g_signal_connect(CS_Clipping, "toggled", G_CALLBACK(check), NULL);
-  g_signal_connect(LB_Clipping, "toggled", G_CALLBACK(check), NULL);
-  name_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_curve_entry"));
-  x_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "x_curve_entry"));
-  y_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "y_curve_entry"));
-  label_number_points = GTK_LABEL(gtk_builder_get_object(builder, "label_number_points"));
-  bspline_check = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"bspline_check"));
+	sz_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sz_entry"));
+    filled = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"fill_poly_checkButton"));
+    CS_Clipping = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"CS_Clipping"));
+    LB_Clipping = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"LB_Clipping"));
+    g_signal_connect(CS_Clipping, "toggled", G_CALLBACK(check), NULL);
+    g_signal_connect(LB_Clipping, "toggled", G_CALLBACK(check), NULL);
+    name_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_curve_entry"));
+    x_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "x_curve_entry"));
+    y_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "y_curve_entry"));
+    z_curve_entry = GTK_ENTRY(gtk_builder_get_object(builder, "z_curve_entry"));
+    label_number_points = GTK_LABEL(gtk_builder_get_object(builder, "label_number_points"));
+    bspline_check = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"bspline_check"));
+    x_check = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"x_check"));
+    y_check = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"y_check"));
+    z_check = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"z_check"));
+    g_signal_connect(x_check, "toggled", G_CALLBACK(check_x), NULL);
+    g_signal_connect(y_check, "toggled", G_CALLBACK(check_y), NULL);
+    g_signal_connect(z_check, "toggled", G_CALLBACK(check_z), NULL);
 
 	gtk_widget_show(GTK_WIDGET(main_w));
 
