@@ -100,6 +100,9 @@ GtkEntry* angle_point_entry;
 GtkEntry* angle_pointx_entry;
 GtkEntry* angle_pointy_entry;
 GtkEntry* angle_pointz_entry;
+GtkEntry* angle_vectorx_entry;
+GtkEntry* angle_vectory_entry;
+GtkEntry* angle_vectorz_entry;
 GtkEntry* sx_entry;
 GtkEntry* sy_entry;
 GtkEntry* sz_entry;
@@ -342,6 +345,9 @@ void on_rotate_point_button_clicked (GtkWidget *widget, gpointer data) {
 	double x = atof(gtk_entry_get_text(angle_pointx_entry));
 	double y = atof(gtk_entry_get_text(angle_pointy_entry));
 	double z = atof(gtk_entry_get_text(angle_pointz_entry));
+	double xv = atof(gtk_entry_get_text(angle_vectorx_entry));
+	double yv = atof(gtk_entry_get_text(angle_vectory_entry));
+	double zv = atof(gtk_entry_get_text(angle_vectorz_entry));
 	accumulator.push_back(Transformation::generate_rz(angle));
 
 }
@@ -646,6 +652,9 @@ int main (int argc, char *argv[]) {
 	angle_pointx_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_pointx_entry"));
 	angle_pointy_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_pointy_entry"));
 	angle_pointz_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_pointz_entry"));
+	angle_vectorx_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_vectorx_entry"));
+	angle_vectory_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_vectory_entry"));
+	angle_vectorz_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_vectorz_entry"));
 	sx_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sx_entry"));
 	sy_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sy_entry"));
 	sz_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sz_entry"));
