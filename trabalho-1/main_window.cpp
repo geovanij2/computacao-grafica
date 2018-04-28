@@ -348,8 +348,9 @@ void on_rotate_point_button_clicked (GtkWidget *widget, gpointer data) {
 	double xv = atof(gtk_entry_get_text(angle_vectorx_entry));
 	double yv = atof(gtk_entry_get_text(angle_vectory_entry));
 	double zv = atof(gtk_entry_get_text(angle_vectorz_entry));
-	accumulator.push_back(Transformation::generate_rz(angle));
-
+	Coordinate p(x, y, z);
+	Coordinate v(xv, yv, zv);
+	accumulator.push_back(Transformation::generate_ra(angle, p, v));
 }
 //ok
 void on_schedule_button_clicked (GtkWidget *widget, gpointer data) {
