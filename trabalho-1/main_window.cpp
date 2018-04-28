@@ -351,7 +351,6 @@ void on_angle_obj_button_clicked(GtkWidget *widget, gpointer data) {
 	double angle = atof(gtk_entry_get_text(angle_obj_entry));
 	
 	//accumulator.push_back(Transformation::generate_full_rotation(0,0,angle,0,center));
-	printf("(%f,%f,%f)\n",center[0],center[1],center[2]);
 	accumulator.push_back(Transformation::generate_translation_matrix(-center[0], -center[1], -center[2]));
 	if (gtk_toggle_button_get_active(x_checkr)) {
 	    accumulator.push_back(Transformation::generate_rx(angle,false));

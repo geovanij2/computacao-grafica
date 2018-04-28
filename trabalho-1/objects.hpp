@@ -464,7 +464,6 @@ class Object3D : public Object {
 		virtual Coordinate get_center_coord() {
 			Coordinate sum(N);
 			int n = 0;
-			std::cout << "ola" << std::endl;
 			for (auto &face : _faces) {
 				for (auto &coord : face.get_coords()) {
 					sum += coord;
@@ -481,7 +480,6 @@ class Object3D : public Object {
 		}
 
 		virtual Coordinate get_normalized_center_coord() {
-		    std::cout << "ola" << std::endl;
 			Coordinate sum(N);
 			int n = 0;
 			for (auto &face : _faces) {
