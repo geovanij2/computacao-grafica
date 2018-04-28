@@ -461,7 +461,7 @@ class Object3D : public Object {
 			}
 		}
 
-		virtual Coordinate get_center_coord() const {
+		virtual Coordinate get_center_coord() {
 			Coordinate sum(N);
 			int n = 0;
 			std::cout << "ola" << std::endl;
@@ -480,7 +480,7 @@ class Object3D : public Object {
 			return sum;
 		}
 
-		virtual Coordinate get_normalized_center_coord() const {
+		virtual Coordinate get_normalized_center_coord() {
 		    std::cout << "ola" << std::endl;
 			Coordinate sum(N);
 			int n = 0;
