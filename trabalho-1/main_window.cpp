@@ -10,7 +10,9 @@
 Viewport* viewport;
 Coordinates polygon_coords;
 Coordinates curve_coords;
+bool isObject3D = false;
 std::vector<Transformation> accumulator;
+std::vector<Polygon> faces_object3D;
 
 GObject *main_w;
 GtkListStore  *store;
@@ -51,6 +53,7 @@ GtkButton* add_point1;
 GtkButton* add_line1;
 GtkButton* add_poly1;
 GtkButton* add_curve1;
+GtkButton* add_object3D1;
 
 //Objetos da janela de adicionar ponto, linha e poligono
 GObject* add_point_w;
@@ -88,6 +91,11 @@ GtkButton* add_point_curve;
 GtkButton* add_curve;
 GtkLabel* label_number_points;
 GtkToggleButton* bspline_check;
+
+GObject* add_object3D_w;
+GtkEntry* name_object3D_entry;
+GtkButton* add_face;
+GtkButton* add_object3D;
 
 //Objects from change_obj_w
 GObject* change_obj_w;
@@ -196,6 +204,7 @@ void on_add_line1_clicked (GtkWidget *widget, gpointer data) {
 }
 
 void on_add_poly1_clicked (GtkWidget *widget, gpointer data) {
+	isObject3D = false;
 	gtk_widget_show (GTK_WIDGET(add_poly_w));
 }
 
@@ -203,6 +212,9 @@ void on_add_curve1_clicked (GtkWidget *widget, gpointer data) {
     gtk_widget_show (GTK_WIDGET(add_curve_w));
 }
 
+void on_add_object3D1_clicked (GtkWidget *widget, gpointer data) {
+    gtk_widget_show (GTK_WIDGET(add_object3D_w));
+}
 
 /* ADD_POINT_W */
 void on_add_point_clicked (GtkWidget *widget, gpointer data) {
@@ -257,9 +269,14 @@ void on_add_point_poly_clicked (GtkWidget *widget, gpointer data) {
 
 void on_add_poly_clicked (GtkWidget *widget, gpointer data) {
   const gchar* name = gtk_entry_get_text(name_poly_entry);
-	fill_treeview(name,"Polygon");
 	Polygon* polygon = new Polygon(name, polygon_coords, gtk_toggle_button_get_active(filled));
-	viewport->addObject(polygon);
+	if (!isObject3D) {
+	    fill_treeview(name,"Polygon");
+	    viewport->addObject(polygon);  
+	} else {
+	    faces_object3D.push_back(*polygon);
+	    gtk_widget_hide (GTK_WIDGET(add_poly_w));
+	}
 	polygon_coords.clear();
     gtk_entry_set_text(name_poly_entry, "");
 }	 	  	 	     	  		  	  	    	      	 	
@@ -301,7 +318,20 @@ void on_add_curve_clicked (GtkWidget *widget, gpointer data) {
     gtk_entry_set_text(y_curve_entry, "");
     gtk_entry_set_text(z_curve_entry, "");
     gtk_entry_set_text(name_curve_entry, "");
-}	 	  	 	     	  		  	  	    	      	 	
+}	
+
+void on_add_face_clicked (GtkWidget *widget, gpointer data) {
+    isObject3D = true;
+    gtk_widget_show (GTK_WIDGET(add_poly_w));
+}
+
+void on_add_object3D_clicked (GtkWidget *widget, gpointer data) {
+    const gchar* name = gtk_entry_get_text(name_object3D_entry);
+    Object3D* object = new Object3D(name, faces_object3D);
+    fill_treeview(name,"Object3D");
+    faces_object3D.clear();
+    viewport->addObject(object);
+}
 
 /* Buttons Change object */
 void on_angle_world_button_clicked (GtkWidget *widget, gpointer data) {
@@ -321,6 +351,7 @@ void on_angle_obj_button_clicked(GtkWidget *widget, gpointer data) {
 	double angle = atof(gtk_entry_get_text(angle_obj_entry));
 	
 	//accumulator.push_back(Transformation::generate_full_rotation(0,0,angle,0,center));
+	printf("(%f,%f,%f)\n",center[0],center[1],center[2]);
 	accumulator.push_back(Transformation::generate_translation_matrix(-center[0], -center[1], -center[2]));
 	if (gtk_toggle_button_get_active(x_checkr)) {
 	    accumulator.push_back(Transformation::generate_rx(angle,false));
@@ -348,9 +379,11 @@ void on_rotate_point_button_clicked (GtkWidget *widget, gpointer data) {
 	double xv = atof(gtk_entry_get_text(angle_vectorx_entry));
 	double yv = atof(gtk_entry_get_text(angle_vectory_entry));
 	double zv = atof(gtk_entry_get_text(angle_vectorz_entry));
+	
 	Coordinate p(x, y, z);
 	Coordinate v(xv, yv, zv);
 	accumulator.push_back(Transformation::generate_ra(angle, p, v));
+
 }
 //ok
 void on_schedule_button_clicked (GtkWidget *widget, gpointer data) {
@@ -570,6 +603,9 @@ int main (int argc, char *argv[]) {
 
     add_curve1 = GTK_BUTTON(gtk_builder_get_object(builder, "add_curve1"));
     g_signal_connect (add_curve1, "clicked", G_CALLBACK (on_add_curve1_clicked), NULL);
+    
+    add_object3D1 = GTK_BUTTON(gtk_builder_get_object(builder, "add_object3D1"));
+    g_signal_connect (add_object3D1, "clicked", G_CALLBACK (on_add_object3D1_clicked), NULL);
 
 
 	/* Delete action windows*/
@@ -584,8 +620,11 @@ int main (int argc, char *argv[]) {
 
     add_curve_w = gtk_builder_get_object (builder, "add_curve_w");
     g_signal_connect (add_curve_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
+    
+    add_object3D_w = gtk_builder_get_object (builder, "add_object3D_w");
+    g_signal_connect (add_object3D_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
 
-	/* Buttons point, line, poly and curve*/
+	/* Buttons point, line, poly, curve and object3D*/
 	add_point = GTK_BUTTON(gtk_builder_get_object(builder, "add_point"));
 	g_signal_connect (add_point, "clicked", G_CALLBACK (on_add_point_clicked), NULL);
 
@@ -603,7 +642,13 @@ int main (int argc, char *argv[]) {
 
     add_curve = GTK_BUTTON(gtk_builder_get_object(builder, "add_curve"));
     g_signal_connect (add_curve, "clicked", G_CALLBACK (on_add_curve_clicked), NULL);
-
+    
+    add_face = GTK_BUTTON(gtk_builder_get_object(builder, "add_face"));
+    g_signal_connect (add_face, "clicked", G_CALLBACK (on_add_face_clicked), NULL);
+    
+    add_object3D = GTK_BUTTON(gtk_builder_get_object(builder, "add_object3D"));
+    g_signal_connect (add_object3D, "clicked", G_CALLBACK (on_add_object3D_clicked), NULL);
+    
 	/* Buttons Change object */
 	change_obj_w = gtk_builder_get_object (builder, "change_obj_w");
 	g_signal_connect (change_obj_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
@@ -656,9 +701,9 @@ int main (int argc, char *argv[]) {
 	angle_vectorx_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_vectorx_entry"));
 	angle_vectory_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_vectory_entry"));
 	angle_vectorz_entry = GTK_ENTRY(gtk_builder_get_object(builder, "angle_vectorz_entry"));
-	sx_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sx_entry"));
-	sy_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sy_entry"));
-	sz_entry =  GTK_ENTRY(gtk_builder_get_object(builder, "sz_entry"));
+	sx_entry = GTK_ENTRY(gtk_builder_get_object(builder, "sx_entry"));
+	sy_entry = GTK_ENTRY(gtk_builder_get_object(builder, "sy_entry"));
+	sz_entry = GTK_ENTRY(gtk_builder_get_object(builder, "sz_entry"));
     filled = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"fill_poly_checkButton"));
     CS_Clipping = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"CS_Clipping"));
     LB_Clipping = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"LB_Clipping"));
@@ -682,7 +727,8 @@ int main (int argc, char *argv[]) {
     g_signal_connect(x_checkr, "toggled", G_CALLBACK(check_xr), NULL);
     g_signal_connect(y_checkr, "toggled", G_CALLBACK(check_yr), NULL);
     g_signal_connect(z_checkr, "toggled", G_CALLBACK(check_zr), NULL);
-
+    name_object3D_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_object3D_entry"));
+    
 	gtk_widget_show(GTK_WIDGET(main_w));
 
 	gtk_main ();

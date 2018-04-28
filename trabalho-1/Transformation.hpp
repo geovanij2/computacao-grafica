@@ -85,33 +85,33 @@ class Transformation {
 		}
 
 		static Transformation generate_ra(double angle_a, const Coordinate& p, const Coordinate& v) {
-			// known vectors
-			if (v[0] == 0 && v[1] == 0 && v[2] == 0) {
-				Matrix m = { {1, 0, 0, 0},
-							 {0, 1, 0, 0},
-							 {0, 0, 1, 0},
-							 {0, 0, 0, 1} };
-				return Transformation(m);
-			}
-			//eixo y
-			else if (v[0] == 0 && v[2] == 0) {
-				return generate_translation_matrix(-p[0], -p[1], -p[2])
-					* generate_ry(angle_a, false)
-					* generate_translation_matrix(p[0], p[1], p[2]);
-			//eixo z
-			} else if (v[0] == 0 && v[1] == 0) {
-				return generate_translation_matrix(-p[0], -p[1], -p[2])
-					* generate_rz(angle_a, false)
-					* generate_translation_matrix(p[0], p[1], p[2]);
-			//eixo x
-			} else if (v[1] == 0 && v[2] == 0) {
-				return generate_translation_matrix(-p[0], -p[1], -p[2])
-					* generate_rx(angle_a, false)
-					* generate_translation_matrix(p[0], p[1], p[2]);
-			}
-			double d = sqrt(v[0] * v[0] + v[2] * v[2]);
-			double beta = atan(v[0]/v[2]);
-			double alpha = atan(v[1]/d);
+    		// known vectors
+    		if (v[0] == 0 && v[1] == 0 && v[2] == 0) {
+    			Matrix m = { {1, 0, 0, 0},
+    						 {0, 1, 0, 0},
+    						 {0, 0, 1, 0},
+    						 {0, 0, 0, 1} };
+    			return Transformation(m);
+    		}
+    		//eixo y
+    		else if (v[0] == 0 && v[2] == 0) {
+    			return generate_translation_matrix(-p[0], -p[1], -p[2])
+    				* generate_ry(angle_a, false)
+    				* generate_translation_matrix(p[0], p[1], p[2]);
+    		//eixo z
+    		} else if (v[0] == 0 && v[1] == 0) {
+    			return generate_translation_matrix(-p[0], -p[1], -p[2])
+    				* generate_rz(angle_a, false)
+    				* generate_translation_matrix(p[0], p[1], p[2]);
+    		//eixo x
+    		} else if (v[1] == 0 && v[2] == 0) {
+    			return generate_translation_matrix(-p[0], -p[1], -p[2])
+    				* generate_rx(angle_a, false)
+    				* generate_translation_matrix(p[0], p[1], p[2]);
+    		}
+    		double d = sqrt(v[0] * v[0] + v[2] * v[2]);
+    		double beta = atan(v[0]/v[2]);
+    		double alpha = atan(v[1]/d);
 
 			return generate_translation_matrix(-p[0],-p[1],-p[2])
 				* generate_ry(-beta, true)
@@ -121,6 +121,7 @@ class Transformation {
 				* generate_ry(beta, true)
 				* generate_translation_matrix(p[0],p[1],p[2]);
 		}
+		
 
 		static Transformation generate_rotation_matrix(double angle_x, double angle_y, double angle_z) {
 			return generate_rx(angle_x) * generate_ry(angle_y) * generate_rz(angle_z);

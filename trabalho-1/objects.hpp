@@ -430,11 +430,11 @@ typedef std::vector<Polygon> face_list;
 
 class Object3D : public Object {
 	public:
-		Object3D(const std::string& name) :
+		Object3D(const std::string name) :
 			Object(name)
 		{}
 
-		Object3D(const std::string& name, const face_list& faces) :
+		Object3D(const std::string name, const face_list& faces) :
 			Object(name)
 		{
 			for (int i = 0; i < faces.size(); ++i) {
@@ -461,26 +461,31 @@ class Object3D : public Object {
 			}
 		}
 
-		Coordinate get_center_coord() const {
+		virtual Coordinate get_center_coord() const {
 			Coordinate sum(N);
 			int n = 0;
-			for (auto face : _faces) {
-				for (auto coord : face.get_coords()) {
+			std::cout << "ola" << std::endl;
+			for (auto &face : _faces) {
+				for (auto &coord : face.get_coords()) {
 					sum += coord;
+					
 				}
 				n += face.get_coords().size();
+				
 			}
+			
 			sum[0] /= n;
 			sum[1] /= n;
 			sum[2] /= n;
 			return sum;
 		}
 
-		Coordinate get_normalized_center_coord() const {
+		virtual Coordinate get_normalized_center_coord() const {
+		    std::cout << "ola" << std::endl;
 			Coordinate sum(N);
 			int n = 0;
-			for (auto face : _faces) {
-				for (auto coord : face.get_normalized_coords())
+			for (auto &face : _faces) {
+				for (auto &coord : face.get_normalized_coords())
 					sum += coord;
 				n += face.get_normalized_coords().size();
 			}
@@ -490,7 +495,7 @@ class Object3D : public Object {
 			return sum;
 		}
 
-		void transform_coords(const Transformation& t) {
+		virtual void transform_coords(const Transformation& t) {
 			Matrix m = t.get_transformation_matrix();
 
 			for (auto &face : _faces) {	 	  	 	     	  		  	  	    	      	 	
@@ -500,7 +505,7 @@ class Object3D : public Object {
 			}
 		}
 
-		void set_normalized_coords(const Transformation& t) {
+		virtual void set_normalized_coords(const Transformation& t) {
 			Matrix m = t.get_transformation_matrix();
 
 			for (auto &face : _faces) {
