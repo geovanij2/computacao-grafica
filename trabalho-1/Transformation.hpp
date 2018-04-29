@@ -21,6 +21,14 @@ class Transformation {
 			return this->_m;
 		};
 
+		static Transformation generate_perspective_matrix(double d) {
+			Matrix m = { { 1,  0,  0,  0  },
+						 { 0,  1,  0,  0  },
+						 { 0,  0,  1, 1/d },
+						 { 0,  0,  0,  0  } };
+			return Transformation(m);
+		}
+
 		static Transformation generate_translation_matrix(double x, double y, double z) {
 			Matrix m = { {1, 0, 0, 0},
 						 {0, 1, 0, 0},

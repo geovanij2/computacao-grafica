@@ -34,9 +34,11 @@ class Coordinate: public std::vector<double> {
  					sum += this->at(j) * m[j][i];
  				}
  				res.push_back(sum);
- 			}	 	  	 	     	  		  	  	    	      	 	
- 			for (int i = 0; i < res.size(); ++i)
- 				this->at(i) = res[i];
+ 			} 	  	 	     	  		  	  	    	      	 	
+ 			for (int i = 0; i < res.size(); ++i) {
+ 				// bringing back to w = 1;
+ 				this->at(i) = res[i]/res[3];
+ 			}
  		}
 
  		Coordinate& operator+=(const Coordinate& other) {

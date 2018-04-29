@@ -8,7 +8,7 @@
 class Window {
 	public:
 		Window(double width, double height):
-			_center(width/2, height/2),
+			_center(width/2, height/2, 0),
 			_width(width),
 			_heigth(height),
 			_t({ {1, 0, 0, 0},
@@ -56,6 +56,7 @@ class Window {
 		Coordinate _center;
 		double _angle_x = 0, _angle_y = 0, _angle_z = 0; // radians
 		double _width, _heigth;
+		double _d = 1000;
 		Transformation _t;
 };
 
@@ -84,8 +85,9 @@ void Window::update_transformation() {
 						  {0, 1, 0, 0},
 						  {0, 0, 1, 0},
 						  {0, 0, 0, 1} });
-	_t *= Transformation::generate_translation_matrix(-_center[0], -_center[1], -_center[2]);
-	_t *= Transformation::generate_rotation_matrix(-_angle_x, _angle_y, -_angle_z);
+	_t *= Transformation::generate_translation_matrix(-_center[0], -_center[1], -_d);
+	_t *= Transformation::generate_rotation_matrix(-_angle_x, -_angle_y, -_angle_z);
+	_t *= Transformation::generate_perspective_matrix(_d);
 	_t *= Transformation::generate_scaling_matrix(1/(_width/2), 1/(_heigth/2), 4.0/(_width + _heigth));
 }
 
