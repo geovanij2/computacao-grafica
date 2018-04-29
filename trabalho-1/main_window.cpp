@@ -263,7 +263,21 @@ void open_file_event (GtkWidget *widget, gpointer data) {
 }
 
 void save_file_event (GtkWidget *widget, gpointer data) {
-    const gchar* name = gtk_entry_get_text(save_file_entry);
+    const gchar* filename = gtk_entry_get_text(save_file_entry);
+
+    if(filename == nullptr)
+        return;
+
+    std::string file(filename);
+    delete filename;
+    try{
+        ObjWriter w(file);
+        w.writeObjs(viewport);
+
+        std::cout<<"Arquivo salvo.\n";
+    }catch(char * e){
+        std::cout<< e<< std::endl;
+    }
 }
 
 /* ADD_POINT_W */

@@ -371,7 +371,7 @@ ObjWriter::ObjWriter(std::string& filename):
 
 void ObjWriter::writeObjs(Viewport* viewport){
     // m_cWriter.loadFile(m_path+m_name+".mtl");
-    m_objsFile << "mtllib " << m_name << ".mtl\n\n";
+    // m_objsFile << "mtllib " << m_name << ".mtl\n\n";
 
     Object *obj;
     int size = viewport->get_display_file_size();
