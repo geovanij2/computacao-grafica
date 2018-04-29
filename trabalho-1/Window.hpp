@@ -85,7 +85,7 @@ void Window::update_transformation() {
 						  {0, 1, 0, 0},
 						  {0, 0, 1, 0},
 						  {0, 0, 0, 1} });
-	_t *= Transformation::generate_translation_matrix(-_center[0], -_center[1], -_d);
+	_t *= Transformation::generate_translation_matrix(-_center[0], -_center[1], _d);
 	_t *= Transformation::generate_rotation_matrix(-_angle_x, -_angle_y, -_angle_z);
 	_t *= Transformation::generate_perspective_matrix(_d);
 	_t *= Transformation::generate_scaling_matrix(1/(_width/2), 1/(_heigth/2), 4.0/(_width + _heigth));
