@@ -36,6 +36,8 @@ GtkEntry* step_entry;
 GtkEntry* angle_entry;
 GtkToggleButton *LB_Clipping,*CS_Clipping;
 GtkToggleButton *x_check,*y_check,*z_check;
+GtkMenuItem* open_file_m;
+GtkMenuItem* save_file_m;
 
 //Enum para TreeView
 enum {	 	  	 	     	  		  	  	    	      	 	
@@ -121,6 +123,13 @@ GtkButton* rotate_point_button;
 GtkButton* schedule_button;
 GtkButton* change_obj_button;
 GtkToggleButton *x_checkr,*y_checkr,*z_checkr;
+
+GObject* open_file_w;
+GtkButton* open_file_b;
+GObject* save_file_w;
+GtkButton* save_file_b;
+GtkEntry* open_file_entry;
+GtkEntry* save_file_entry;
 
 void fill_treeview(const char* name,const char* type);
 int get_index_selected();
@@ -214,6 +223,22 @@ void on_add_curve1_clicked (GtkWidget *widget, gpointer data) {
 
 void on_add_object3D1_clicked (GtkWidget *widget, gpointer data) {
     gtk_widget_show (GTK_WIDGET(add_object3D_w));
+}
+
+void open_file_menu (GtkWidget *widget, gpointer data) {
+    gtk_widget_show (GTK_WIDGET(open_file_w));
+}
+
+void save_file_menu (GtkWidget *widget, gpointer data) {
+    gtk_widget_show (GTK_WIDGET(save_file_w));
+}
+
+void open_file_event (GtkWidget *widget, gpointer data) {
+    const gchar* name = gtk_entry_get_text(open_file_entry);
+}
+
+void save_file_event (GtkWidget *widget, gpointer data) {
+    const gchar* name = gtk_entry_get_text(save_file_entry);
 }
 
 /* ADD_POINT_W */
@@ -350,7 +375,6 @@ void on_angle_obj_button_clicked(GtkWidget *widget, gpointer data) {
 	Coordinate center = (viewport->getObject(index))->get_center_coord();
 	double angle = atof(gtk_entry_get_text(angle_obj_entry));
 	
-	//accumulator.push_back(Transformation::generate_full_rotation(0,0,angle,0,center));
 	accumulator.push_back(Transformation::generate_translation_matrix(-center[0], -center[1], -center[2]));
 	if (gtk_toggle_button_get_active(x_checkr)) {
 	    accumulator.push_back(Transformation::generate_rx(angle,false));
@@ -669,6 +693,26 @@ int main (int argc, char *argv[]) {
 
 	change_obj_button = GTK_BUTTON(gtk_builder_get_object(builder, "change_obj_button"));
 	g_signal_connect (change_obj_button, "clicked", G_CALLBACK (on_change_obj_button_clicked), NULL);
+	
+	/*.OBJ files*/
+	open_file_m = GTK_MENU_ITEM(gtk_builder_get_object(builder, "imagemenuitem2"));
+	g_signal_connect (open_file_m, "activate", G_CALLBACK (open_file_menu), NULL);
+
+	save_file_m = GTK_MENU_ITEM(gtk_builder_get_object(builder, "imagemenuitem3"));
+	g_signal_connect (save_file_m, "activate", G_CALLBACK (save_file_menu), NULL);
+	
+	open_file_w = gtk_builder_get_object (builder, "open_file_w");
+	g_signal_connect (open_file_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
+
+	save_file_w = gtk_builder_get_object (builder, "save_file_w");
+	g_signal_connect (save_file_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
+	
+	open_file_b = GTK_BUTTON(gtk_builder_get_object(builder, "open_file_b"));
+	g_signal_connect (open_file_b, "clicked", G_CALLBACK (open_file_event), NULL);
+	
+	save_file_b = GTK_BUTTON(gtk_builder_get_object(builder, "save_file_b"));
+	g_signal_connect (save_file_b, "clicked", G_CALLBACK (save_file_event), NULL);
+	
 
 	/* Connecting Entry*/
 	step_entry = GTK_ENTRY(gtk_builder_get_object(builder, "step_entry"));
@@ -727,6 +771,9 @@ int main (int argc, char *argv[]) {
     g_signal_connect(y_checkr, "toggled", G_CALLBACK(check_yr), NULL);
     g_signal_connect(z_checkr, "toggled", G_CALLBACK(check_zr), NULL);
     name_object3D_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_object3D_entry"));
+    open_file_entry = GTK_ENTRY(gtk_builder_get_object(builder, "open_file_entry"));
+    save_file_entry = GTK_ENTRY(gtk_builder_get_object(builder, "save_file_entry"));
+    
     
 	gtk_widget_show(GTK_WIDGET(main_w));
 
