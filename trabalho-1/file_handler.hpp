@@ -43,7 +43,7 @@
 // };
 
 // class ColorWriter
-// {
+// {	 	  	 	     	  		  	  	    	      	 	
 //     public:
 //         ColorWriter(){}
 //         void loadFile(const std::string& filename);
@@ -115,10 +115,10 @@ class ObjReader : public ObjStream
 };
 
 class ObjWriter : public ObjStream
-{
+{	 	  	 	     	  		  	  	    	      	 	
     public:
         ObjWriter(std::string& filename);
-        void writeObjs(World *world);
+        void writeObjs(Viewport *viewport);
 
     private:
         void printObj(Object* obj);
@@ -144,7 +144,7 @@ ObjReader::ObjReader(std::string& filename):
 
     m_objsFile.open(filename.c_str());
     if(!m_objsFile.is_open())
-        throw MyException("Erro tentando abrir o arquivo:\n\t" + filename + ".\n");
+        throw "Erro tentando abrir o arquivo";
     else
         loadObjs();
 }
@@ -152,7 +152,7 @@ ObjReader::ObjReader(std::string& filename):
 void ObjReader::destroyObjs(){
     for(auto o : m_objs)
         delete o;
-}
+}	 	  	 	     	  		  	  	    	      	 	
 
 void ObjReader::addObj3D(){
     std::string name = m_numSubObjs == 0 ? m_name :
@@ -189,7 +189,7 @@ void ObjReader::loadObjs(){
         else if(keyWord == "vt")        { /* Não faz nada... */ }                    // vt u v w
         else if(keyWord == "vn")        { /* Não faz nada... */ }                    // vn i j k
         else if(keyWord == "vp")        { /* Não faz nada... */ }                    // vp u v w
-    }
+    }	 	  	 	     	  		  	  	    	      	 	
     // Se chegar ao final e tiver alguma
     //  Face salva, ela pertence ao ultimo
     //  objeto 3D
@@ -225,7 +225,7 @@ void ObjReader::addCoord(std::stringstream& line){
     double x=0,y=0,z=0;
     line >> x >> y >> z;
     m_coords.emplace_back(x,y,z);
-}
+}	 	  	 	     	  		  	  	    	      	 	
 
 void ObjReader::addPoint(std::stringstream& line){
     if(m_faces.size() != 0)
@@ -261,21 +261,20 @@ void ObjReader::addPoly(std::stringstream& line, bool filled){
     else
         m_objs.push_back(new Polygon(name, objCoords, filled));
     m_numSubObjs++;
-}
+}	 	  	 	     	  		  	  	    	      	 	
 
 void ObjReader::addFace(std::stringstream& line){
     Coordinates objCoords;
     loadCoordsIndexes(line, objCoords);
 
     std::string name = "face"+std::to_string(m_faces.size()+1);
-    m_faces.emplace_back(name, objCoords);
+    m_faces.emplace_back(name, objCoords, false);
 }
 
 void ObjReader::addCurve(std::stringstream& line){
     if(m_freeFormType == obj_type::OBJECT){
         destroyObjs();
-        throw MyException("Tentativa de criar uma curva sem 'cstype' na linha: "+
-                          line.str() +".\n");
+        throw "Tentativa de criar uma curva sem 'cstype' na linha";
     }
 
     if(m_faces.size() != 0)
@@ -294,11 +293,11 @@ void ObjReader::addCurve(std::stringstream& line){
     if(m_freeFormType == obj_type::BEZIER_CURVE)
         m_objs.push_back(new BezierCurve(name, objCoords));
     else if(m_freeFormType == obj_type::BSPLINE_CURVE)
-        m_objs.push_back(new BSplineCurve(name, objCoords));
+        m_objs.push_back(new BsplineCurve(name, objCoords));
     m_numSubObjs++;
 }
 
-void ObjReader::loadCoordsIndexes(std::stringstream& line, Coordinates& objCoords){
+void ObjReader::loadCoordsIndexes(std::stringstream& line, Coordinates& objCoords){	 	  	 	     	  		  	  	    	      	 	
     std::string pointString;
     int index = 0;
     int size = m_coords.size();
@@ -316,7 +315,7 @@ void ObjReader::loadCoordsIndexes(std::stringstream& line, Coordinates& objCoord
 
             if(!point){// É obrigado a ter um vertice
                 destroyObjs();
-                throw MyException("Indice de vertice invalido na linha: "+ line.str() + ".\n");
+                throw "Indice de vertice invalido na linha";
             }
 
             // Processa o index do vertice
@@ -327,7 +326,7 @@ void ObjReader::loadCoordsIndexes(std::stringstream& line, Coordinates& objCoord
 
             if(index < 0 || index >= size){
                 destroyObjs();
-                throw MyException("Indice de vertice invalido na linha: "+ line.str() + ".\n");
+                throw "Indice de vertice invalido na linha";
             }
             objCoords.push_back(m_coords[index]);
         }
@@ -337,7 +336,7 @@ void ObjReader::loadCoordsIndexes(std::stringstream& line, Coordinates& objCoord
             // Pegue a proxima linha caso ache '\'
             //  ao final da linha atual
             std::string tmp;
-            if(std::getline(m_objsFile, tmp)){
+            if(std::getline(m_objsFile, tmp)){	 	  	 	     	  		  	  	    	      	 	
                 //line = std::stringstream(tmp);
                 line.str(tmp);
                 line.clear();
@@ -357,8 +356,7 @@ void ObjReader::setFreeFormType(std::stringstream& line){
     else if(type == "bspline"){ m_freeFormType = obj_type::BSPLINE_CURVE; }
     else{
         destroyObjs();
-        throw MyException("cstype igual a: '"+
-                        type+"', nao eh suportado por esta aplicacao.\n");
+        throw "cstype nao eh suportado por esta aplicacao";
     }
 }
 
@@ -368,18 +366,18 @@ ObjWriter::ObjWriter(std::string& filename):
     m_objsFile.open(filename.c_str(), std::fstream::out);
 
     if(!m_objsFile.is_open())
-        throw MyException("Erro tentando abrir arquivo:\n\t" + filename + ".\n");
+        throw "Erro tentando abrir arquivo";
 }
 
-void ObjWriter::writeObjs(ListaEnc<Object*> objects){
-    m_cWriter.loadFile(m_path+m_name+".mtl");
+void ObjWriter::writeObjs(Viewport* viewport){
+    // m_cWriter.loadFile(m_path+m_name+".mtl");
     m_objsFile << "mtllib " << m_name << ".mtl\n\n";
 
     Object *obj;
-    int size = objects->tamanho();
-    for(int i = 0; i<size; i++){
-        obj = objects->retornaDaPosicao(i);
-        if(obj->get_type() == ObjType::OBJECT3D)
+    int size = viewport->get_display_file_size();
+    for(int i = 0; i<size; i++){	 	  	 	     	  		  	  	    	      	 	
+        obj = viewport->getObject(i);
+        if(obj->get_type() == obj_type::OBJECT_3D)
             printObj3D((Object3D*) obj);
         else
             printObj(obj);
@@ -426,9 +424,9 @@ void ObjWriter::printObj(Object* obj){
         m_objsFile << "deg 3\n";
         keyWord = "curv 0.0 0.0";
         break;
-    case obj_type::OBJECT3D:
+    case obj_type::OBJECT_3D:
         break;//nunca vai acontecer
-    }
+    }	 	  	 	     	  		  	  	    	      	 	
 
     int size = coords.size();
     m_objsFile << keyWord;
@@ -464,7 +462,7 @@ void ObjWriter::printObj3D(Object3D* obj){
         m_objsFile << "\n";
         m_numVertex += face_size;
     }
-}
+}	 	  	 	     	  		  	  	    	      	 	
 
 // bool ColorReader::loadFile(const std::string& filename){
 //     m_ifs.open(filename);
@@ -500,7 +498,7 @@ void ObjWriter::printObj3D(Object3D* obj){
 //     auto iter = m_colors.find(colorName);
 //     if(iter != m_colors.end())
 //         return iter->second;
-//     else{
+//     else{	 	  	 	     	  		  	  	    	      	 	
 //         auto iter2 = m_colors.find("Padrao");
 //         return iter2->second;
 //     }
@@ -537,3 +535,4 @@ void ObjWriter::printObj3D(Object3D* obj){
 // }
 
 #endif // FILEHANDLERS_HPP
+	 	  	 	     	  		  	  	    	      	 	

@@ -5,6 +5,7 @@
 #include "Viewport.hpp"
 #include "objects.hpp"
 #include "Transformation.hpp"
+#include "file_handler.hpp"
 
 //Objetos da main window
 Viewport* viewport;
@@ -234,7 +235,31 @@ void save_file_menu (GtkWidget *widget, gpointer data) {
 }
 
 void open_file_event (GtkWidget *widget, gpointer data) {
-    const gchar* name = gtk_entry_get_text(open_file_entry);
+    const gchar* filename = gtk_entry_get_text(open_file_entry);
+
+    if(filename == nullptr)
+        return;
+
+    std::string file(filename);
+    delete filename;
+    try{
+        ObjReader r(file);
+        for(auto obj : r.getObjs()){
+            try{
+                viewport->addObject(obj);
+                fill_treeview(obj->get_name().c_str(),obj->get_type_name().c_str());
+
+                // gtk_widget_queue_draw(m_mainWindow);
+            }catch(char* e){
+                std::cout<<e<<std::endl;
+                delete obj;
+            }
+        }
+
+        std::cout<<"Arquivo carregado.\n";
+    }catch(char* e){
+        std::cout<<e<<std::endl;
+    }
 }
 
 void save_file_event (GtkWidget *widget, gpointer data) {

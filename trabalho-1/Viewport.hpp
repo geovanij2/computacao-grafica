@@ -30,6 +30,7 @@ class Viewport {
 		void drawDisplayFile(cairo_t* cr);
 		void addObject(Object* obj) { _objetos.adiciona(obj); normalize_and_clip_obj(obj); };
 		Object* getObject(int index) { _objetos.retornaDaPosicao(index);};
+		int get_display_file_size() { return _objetos.tamanho(); };
 		Coordinate transformOneCoordinate(const Coordinate& c) const;
 		Coordinates transformOneCoordinates(const Coordinates& coords) const;
 		void normalize_obj(Object* obj);
