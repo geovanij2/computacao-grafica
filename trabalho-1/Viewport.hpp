@@ -4,7 +4,7 @@
 #include "Window.hpp"
 #include "objects.hpp"
 #include "ListaEnc.hpp"
-#include "elemento.hpp"
+#include "Elemento.hpp"
 #include "clipping.hpp"
 
 class Viewport {
