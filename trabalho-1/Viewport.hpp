@@ -24,6 +24,7 @@ class Viewport {
 		void moveY(double value);
 		void moveZ(double value);
 		void change_view(const window_view view);
+		void set_focal_distance(double d);
 		void rotate_window_on_x(double degrees);
 		void rotate_window_on_y(double degrees);
 		void rotate_window_on_z(double degrees);
@@ -79,6 +80,11 @@ void Viewport::moveZ(double step){
 void Viewport::change_view(const window_view view){
 	_window->change_view(view);
 	normalize_and_clip_all_objs();
+}
+
+void Viewport::set_focal_distance(double d){
+    _window->set_focal_distance(d);
+    normalize_and_clip_all_objs();
 }
 
 void Viewport::rotate_window_on_x(double degrees) {

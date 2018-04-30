@@ -39,7 +39,7 @@ class Window {
 		void moveZ(double value);
 
 		void change_view(const window_view view) { _view = view; }
-		void set_focal_distance(double d) { _d = d; }
+		void set_focal_distance(double fov) { _d = (_width/2)/tan(fov/2); std::cout << _d << std::endl;}
 
 		Coordinate lowmin() const { return Coordinate(-1,-1); }	 	  	 	     	  		  	  	    	      	 	
 		Coordinate uppermax() const { return Coordinate(1,1); }
@@ -101,6 +101,11 @@ void Window::update_transformation() {
 			_t *= Transformation::generate_translation_matrix(-_center[0], -_center[1], -_center[2]);
 			_t *= Transformation::generate_rotation_matrix(-_angle_x, -_angle_y, -_angle_z);
 			_t *= Transformation::generate_scaling_matrix(1/(_width/2), 1/(_heigth/2), 4.0/(_width + _heigth));
+	}
+}
+
+#endif
+;
 	}
 }
 

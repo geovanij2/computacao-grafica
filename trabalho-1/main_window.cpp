@@ -42,6 +42,7 @@ GtkToggleButton *check_parallel,*check_perspective;
 GtkToggleButton *x_check,*y_check,*z_check;
 GtkMenuItem* open_file_m;
 GtkMenuItem* save_file_m;
+GtkAdjustment* fov_scale;
 
 //Enum para TreeView
 enum {	 	  	 	     	  		  	  	    	      	 	
@@ -515,6 +516,10 @@ gboolean draw_objects(GtkWidget* widget, cairo_t* cr, gpointer data) {
 	return FALSE;
 }	 	  	 	     	  		  	  	    	      	 	
 
+void fov_scale_event(){
+    //std::cout << gtk_adjustment_get_value (fov_scale)<< std::endl;
+    viewport->set_focal_distance(gtk_adjustment_get_value (fov_scale)*PI/180);
+}
 int get_index_selected() {
 	GtkTreeIter iter;
 	GtkTreeModel *model;
@@ -644,6 +649,9 @@ int main (int argc, char *argv[]) {
 
 	draw_viewport = GTK_WIDGET(gtk_builder_get_object(builder, "draw_viewport"));
 	g_signal_connect(draw_viewport, "draw", G_CALLBACK(draw_objects), NULL);
+	
+	fov_scale = GTK_ADJUSTMENT(gtk_builder_get_object(builder, "adjustment1"));
+    g_signal_connect(fov_scale, "value-changed", G_CALLBACK(fov_scale_event), NULL);
 
 	/* Buttons */
 	zoom_out = GTK_BUTTON(gtk_builder_get_object(builder, "zoom_out"));
