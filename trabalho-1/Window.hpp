@@ -39,7 +39,7 @@ class Window {
 		void moveZ(double value);
 
 		void change_view(const window_view view) { _view = view; }
-		void set_focal_distance(double fov) { _d = (_width/2)/tan(fov/2);}
+		void set_focal_distance(double fov) { _d = (_width/2)/tan(fov/2); }
 
 		Coordinate lowmin() const { return Coordinate(-1,-1); }	 	  	 	     	  		  	  	    	      	 	
 		Coordinate uppermax() const { return Coordinate(1,1); }
@@ -105,4 +105,3 @@ void Window::update_transformation() {
 }
 
 #endif
-;
