@@ -106,7 +106,3 @@ void Window::update_transformation() {
 
 #endif
 ;
-	}
-}
-
-#endif
