@@ -4,7 +4,7 @@
 #include "Window.hpp"
 #include "objects.hpp"
 #include "ListaEnc.hpp"
-#include "Elemento.hpp"
+#include "elemento.hpp"
 #include "clipping.hpp"
 
 class Viewport {
@@ -23,6 +23,7 @@ class Viewport {
 		void moveX(double value);
 		void moveY(double value);
 		void moveZ(double value);
+		void change_view(const window_view view);
 		void rotate_window_on_x(double degrees);
 		void rotate_window_on_y(double degrees);
 		void rotate_window_on_z(double degrees);
@@ -67,6 +68,16 @@ void Viewport::moveX(double step) {
 
 void Viewport::moveY(double step){
 	_window->moveY(step);
+	normalize_and_clip_all_objs();
+}
+
+void Viewport::moveZ(double step){
+	_window->moveZ(step);
+	normalize_and_clip_all_objs();
+}
+
+void Viewport::change_view(const window_view view){
+	_window->change_view(view);
 	normalize_and_clip_all_objs();
 }
 

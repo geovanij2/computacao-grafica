@@ -29,6 +29,8 @@ GtkButton* move_down;
 GtkButton* move_up;
 GtkButton* move_right;
 GtkButton* move_left;
+GtkButton* move_back;
+GtkButton* move_forward;
 GtkButton* add_geometric_shape;
 GtkButton* change_object;
 GtkButton* rotate_left;
@@ -36,6 +38,7 @@ GtkButton* rotate_right;
 GtkEntry* step_entry;
 GtkEntry* angle_entry;
 GtkToggleButton *LB_Clipping,*CS_Clipping;
+GtkToggleButton *check_parallel,*check_perspective;
 GtkToggleButton *x_check,*y_check,*z_check;
 GtkMenuItem* open_file_m;
 GtkMenuItem* save_file_m;
@@ -166,6 +169,16 @@ void on_left_button_clicked (GtkWidget *widget, gpointer data) {
 void on_right_button_clicked (GtkWidget *widget, gpointer data) {
 	double step = atof(gtk_entry_get_text(step_entry));
 	viewport->moveX(step);
+}
+
+void on_back_button_clicked (GtkWidget *widget, gpointer data) {
+	double step = atof(gtk_entry_get_text(step_entry));
+	viewport->moveZ(-step);
+}
+
+void on_forward_button_clicked (GtkWidget *widget, gpointer data) {
+	double step = atof(gtk_entry_get_text(step_entry));
+	viewport->moveZ(step);
 }
 
 void on_rotate_right_clicked (GtkWidget *widget, gpointer data) {
@@ -530,6 +543,19 @@ void check() {
         viewport->changeLineClipAlg(Line_clip_algs::CS);
 }
 
+void check_parallel_event() {
+	if (gtk_toggle_button_get_active(check_parallel)) {
+        gtk_toggle_button_set_active(check_perspective, false);
+        viewport->change_view(window_view::PARALLEL);
+    }
+}
+
+void check_perspective_event() {
+	if (gtk_toggle_button_get_active(check_perspective)) {
+        gtk_toggle_button_set_active(check_parallel, false);
+        viewport->change_view(window_view::PERSPECTIVE);
+    }
+}
 void check_x() {
     if (gtk_toggle_button_get_active(x_check)) {
         gtk_toggle_button_set_active(y_check, false);
@@ -637,6 +663,12 @@ int main (int argc, char *argv[]) {
 
 	move_right = GTK_BUTTON(gtk_builder_get_object(builder, "move_right"));
 	g_signal_connect (move_right, "clicked", G_CALLBACK (on_right_button_clicked), NULL);
+
+	move_back = GTK_BUTTON(gtk_builder_get_object(builder, "move_back"));
+	g_signal_connect (move_back, "clicked", G_CALLBACK (on_back_button_clicked), NULL);
+
+	move_forward = GTK_BUTTON(gtk_builder_get_object(builder, "move_forward"));
+	g_signal_connect (move_forward, "clicked", G_CALLBACK (on_forward_button_clicked), NULL);
 
 	add_geometric_shape = GTK_BUTTON(gtk_builder_get_object(builder, "add_geometric_shape"));
 	g_signal_connect (add_geometric_shape, "clicked", G_CALLBACK (on_add_object_button_clicked), NULL);
@@ -812,6 +844,10 @@ int main (int argc, char *argv[]) {
     name_object3D_entry = GTK_ENTRY(gtk_builder_get_object(builder, "name_object3D_entry"));
     open_file_entry = GTK_ENTRY(gtk_builder_get_object(builder, "open_file_entry"));
     save_file_entry = GTK_ENTRY(gtk_builder_get_object(builder, "save_file_entry"));
+	check_parallel = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"check_parallel"));
+    check_perspective = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"check_perspective"));
+    g_signal_connect(check_parallel, "toggled", G_CALLBACK(check_parallel_event), NULL);
+    g_signal_connect(check_perspective, "toggled", G_CALLBACK(check_perspective_event), NULL);
     
     
 	gtk_widget_show(GTK_WIDGET(main_w));
