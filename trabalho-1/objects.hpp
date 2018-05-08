@@ -11,6 +11,8 @@
 #define N 3
 
 typedef std::vector<Coordinate> Coordinates;
+typedef std::vector<std::vector<Coordinate>> control_matrix;
+
 enum obj_type { OBJECT,
 				POINT,
 				LINE,
@@ -18,7 +20,9 @@ enum obj_type { OBJECT,
 				CURVE,
 				BEZIER_CURVE,
 				BSPLINE_CURVE,
-				OBJECT_3D };
+				OBJECT_3D,
+				BEZIER_SURFACE,
+				BSPLINE_SURFACE };
 
 class Object {
 	public:
@@ -138,13 +142,13 @@ class Object {
 
 		virtual bool isFilled() { return false; }
 
+		void add_coordinate(const Coordinate& coord) {	 	  	 	     	  		  	  	    	      	 	
+			_coords.push_back(coord);
+		}
+
 	protected:
 		void add_coordinate(double x , double y, double z) {
 			_coords.emplace_back(x,y,z);
-		}
-
-		void add_coordinate(const Coordinate& coord) {	 	  	 	     	  		  	  	    	      	 	
-			_coords.push_back(coord);
 		}
 
 		void add_coordinate(const Coordinates& coords) {
@@ -252,7 +256,7 @@ class Polygon : public Object {
 		bool _filled;
 };
 
-class Curve : public Object {	 	  	 	     	  		  	  	    	      	 	
+class Curve : public Object {
 	public:
 		Curve(std::string& name) :
 			Object(name)
@@ -286,6 +290,10 @@ class Curve : public Object {
 
 class BezierCurve : public Curve {
 	public:
+		BezierCurve(std::string name) :
+			Curve(name)
+		{}
+
 		BezierCurve(std::string name, const Coordinates& coords) :
 			Curve(name)
 		{	 	  	 	     	  		  	  	    	      	 	
@@ -521,5 +529,187 @@ class Object3D : public Object {
 		face_list _faces;
 };
 
-#endif
-	 	  	 	     	  		  	  	    	      	 	
+typedef std::vector<Curve> curve_list;
+
+class Surface : public Object {
+	public:
+		Surface(const std::string& name) :
+			Object(name)
+		{}
+		
+		~Surface() {}
+
+		virtual void generate_surface() {};
+
+		control_matrix& get_control_points() {
+			return _control_points;
+		}
+
+		virtual void transform_coords(const Transformation& t) {
+			Matrix m = t.get_transformation_matrix();
+
+			for (auto &curve : _curve_list) {
+				for (auto &coord : curve.get_coords()) {
+					coord.transform(m);
+				}
+			}
+		}
+
+		virtual void set_normalized_coords(const Transformation& t) {
+			Matrix m = t.get_transformation_matrix();
+
+			for (auto &curve : _curve_list) {
+				auto &coords = curve.get_normalized_coords();
+				if (coords.size() > 0)
+					coords.clear();
+				for (auto coord : curve.get_coords()) {
+				    coord.transform(m);
+					coords.push_back(coord);
+				}
+			}
+		}
+
+		virtual Coordinate get_center_coord() {
+			Coordinate sum(N);
+			int n = 0;
+			for (auto &curve : _curve_list) {
+				for (auto &coord : curve.get_coords()) {
+					sum += coord;	
+				}
+				n += curve.get_coords().size();		
+			}
+			
+			sum[0] /= n;
+			sum[1] /= n;
+			sum[2] /= n;
+			return sum;
+		}
+
+		virtual Coordinate get_normalized_center_coord() {
+			Coordinate sum(N);
+			int n = 0;
+			for (auto &curve : _curve_list) {
+				for (auto &coord : curve.get_normalized_coords())
+					sum += coord;
+				n += curve.get_normalized_coords().size();
+			}
+			sum[0] /= n;
+			sum[1] /= n;
+			sum[2] /= n;
+			return sum;
+		}
+
+		curve_list& get_curve_list() {
+			return _curve_list;
+		}
+
+	protected:
+		void set_control_points(const control_matrix& m) {
+			std::vector<Coordinate> aux;
+			for (int i = 0; i < m.size(); i++) {
+				aux.clear();
+				for (int j = 0; j < m[i].size(); j++) {
+					aux.push_back(m[i][j]);
+				}
+				this->_control_points.push_back(aux);
+			}
+		}
+
+		control_matrix _control_points;
+		double _step = 0.02;
+		curve_list _curve_list;
+};
+
+class BezierSurface : public Surface {
+	public:
+		BezierSurface(const std::string& name):
+			Surface(name)
+		{}
+
+		BezierSurface(const std::string& name, const control_matrix& m):
+			Surface(name)
+		{
+			set_control_points(m);
+			generate_surface();
+		}
+
+		virtual obj_type get_type() const {
+			return obj_type::BEZIER_SURFACE;
+		}
+
+		virtual std::string get_type_name() const {
+			return "Bezier Curve";
+		}
+
+		virtual void generate_surface() {
+			for(double s = 0.0; s <= 1.0; s += _step){
+				double s2 = s * s;
+				double s3 = s2 * s;
+
+				BezierCurve curve("curve"+std::to_string(s));
+				for(double t = 0.0; t <= 1.0; t += _step){
+					double t2 = t * t;
+					double t3 = t2 * t;
+
+					curve.add_coordinate(blending_function(s,s2,s3,t,t2,t3));
+				}
+				_curve_list.push_back(curve);
+			}
+
+			for(double t = 0.0; t <= 1.0; t += _step){
+				double t2 = t * t;
+				double t3 = t2 * t;
+
+				BezierCurve curve("curve"+std::to_string(t));
+				for(double s = 0.0; s <= 1.0; s += _step){
+					double s2 = s * s;
+					double s3 = s2 * s;
+
+					curve.add_coordinate(blending_function(s,s2,s3,t,t2,t3));
+				}
+				_curve_list.push_back(curve);
+			}
+		}
+
+		Coordinate blending_function(double s, double s2, double s3, double t, double t2, double t3) {
+			std::vector<double> aux;
+
+			double A = (-s3 + (3 * s2) - (3 * s2) + 1);
+			double B = ((3 * s3) - (6 * s2) + (3 * s));
+			double C = (-(3 * s3) + (3 * s2));
+			double D = (s3);
+
+			double E = (-t3 + (3 * t2) - (3 * t) + 1);
+			double F = ((3 * t3) - (6 * t2) + (3 * t));
+			double G = (-(3 * t3) + (3 * t2));
+			double H = (t3);
+
+			for (int i = 0; i < 3; i ++) {
+				double W = ((A * _control_points[0][0][i])
+							+ (B * _control_points[1][0][i])
+							+ (C * _control_points[2][0][i])
+							+ (D * _control_points[3][0][i]));
+
+				double X = ((A * _control_points[0][1][i])
+							+ (B * _control_points[1][1][i])
+							+ (C * _control_points[2][1][i])
+							+ (D * _control_points[3][1][i]));
+
+				double Y = ((A * _control_points[0][2][i])
+							+ (B * _control_points[1][2][i])
+							+ (C * _control_points[2][2][i])
+							+ (D * _control_points[3][2][i]));
+
+				double Z = ((A * _control_points[0][3][i])
+							+ (B * _control_points[1][3][i])
+							+ (C * _control_points[2][3][i])
+							+ (D * _control_points[3][3][i]));
+
+				double value = ((W * E) + (X * F) + (Y * G) + (Z + H));
+				aux.push_back(value);
+			}
+    		return Coordinate(aux[0], aux[1], aux[2]);
+		}
+};
+
+#endif	 	  	 	     	  		  	  	    	      	 	
