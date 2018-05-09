@@ -462,13 +462,13 @@ void on_add_surface_clicked (GtkWidget *widget, gpointer data) {
   const gchar* name = gtk_entry_get_text(name_surface_entry);
   if (gtk_toggle_button_get_active(bspline_checksurface)){
         fill_treeview(name,"B-Spline Surface");
-        //BsplineSurface* surface = new BsplineSurface(name, surface_coords);
-        //viewport->addObject(surface);
+        BSplineSurface* surface = new BSplineSurface(name, surface_coords);
+        viewport->addObject(surface);
         surface_coords.clear();
   } else if (gtk_toggle_button_get_active(bezier_checksurface)) {
         fill_treeview(name,"Bezier Surface");
-        //BezierSurface* surface = new BezierSurface(name, surface_coords);
-        //viewport->addObject(curve);
+        BezierSurface* surface = new BezierSurface(name, surface_coords);
+        viewport->addObject(surface);
         surface_coords.clear();
   } 
   

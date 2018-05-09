@@ -55,6 +55,7 @@ class Clipping {
 
 bool Clipping::clip(Object* obj) {
     Object3D *obj_3d;
+	Surface *surf;
     bool draw;
 	switch(obj->get_type()) {
 		case obj_type::OBJECT:
@@ -79,6 +80,18 @@ bool Clipping::clip(Object* obj) {
 				draw |= tmp;
 			}
 			return draw;
+		case obj_type::BEZIER_SURFACE:
+		case obj_type::BSPLINE_SURFACE:
+			surf = (Surface*) obj;
+			draw = false;
+			for(auto &curve : surf->get_curve_list()){
+				bool tmp = clip_curve(&curve);
+				if(!tmp) {
+					curve.get_normalized_coords().clear();
+				}
+				draw |= tmp;
+			}
+        	return draw;
 		default:
 			return false;
 	}	 	  	 	     	  		  	  	    	      	 	

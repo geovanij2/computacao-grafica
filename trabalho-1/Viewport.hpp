@@ -54,6 +54,7 @@ class Viewport {
 		void drawPolygon(Object* objeto, cairo_t* cr);
 		void drawCurve(Object* obj, cairo_t* cr);
 		void drawObj3D(Object3D* obj, cairo_t* cr);
+		void drawSurface(Surface* obj, cairo_t* cr);
 
 };
 
@@ -207,6 +208,14 @@ void Viewport::drawObj3D(Object3D* obj, cairo_t* cr) {
 	}
 }
 
+void Viewport::drawSurface(Surface* obj, cairo_t* cr) {
+	for (auto &curve : obj->get_curve_list()) {
+		if (curve.get_normalized_coords().size() > 0) {
+			drawCurve(&curve, cr);
+		}
+	}
+}
+
 void Viewport::drawDisplayFile(cairo_t* cr) {
 	//percorrer o displayfile enviando os objetos para o respectivo draw
 	for (int i = 0; i < _objetos.tamanho(); ++i) {
@@ -229,6 +238,10 @@ void Viewport::drawDisplayFile(cairo_t* cr) {
 				break;
 			case obj_type::OBJECT_3D:
 				drawObj3D((Object3D*) obj, cr);
+				break;
+			case obj_type::BEZIER_SURFACE:
+			case obj_type::BSPLINE_SURFACE:
+				drawSurface((Surface*) obj, cr);
 				break;
 			default:
 				break;
