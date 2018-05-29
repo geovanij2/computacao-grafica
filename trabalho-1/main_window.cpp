@@ -13,6 +13,8 @@ Viewport* viewport;
 Coordinates polygon_coords;
 Coordinates curve_coords;
 Coordinates surface_coords;
+gint rows_s;
+gint columns_s;
 bool isObject3D = false;
 std::vector<Transformation> accumulator;
 std::vector<Polygon> faces_object3D;
@@ -117,6 +119,11 @@ GtkButton* add_surface;
 GtkLabel* label_number_points_s;
 GtkToggleButton* bspline_checksurface;
 GtkToggleButton* bezier_checksurface;
+
+GObject* dim_surface_w;
+GtkButton* create_m_surface;
+GtkSpinButton* columns_surface;
+GtkSpinButton* rows_surface;
 
 //Objects from change_obj_w
 GObject* change_obj_w;
@@ -235,27 +242,33 @@ void on_change_object_clicked (GtkWidget *widget, gpointer data) {
 /* ADD_GEOMETRIC_W */
 void on_add_point1_clicked (GtkWidget *widget, gpointer data) {
 	gtk_widget_show (GTK_WIDGET(add_point_w));
+	gtk_widget_hide (GTK_WIDGET(add_geometric_shape_w));
 }
 
 void on_add_line1_clicked (GtkWidget *widget, gpointer data) {
 	gtk_widget_show (GTK_WIDGET(add_line_w));
+	gtk_widget_hide (GTK_WIDGET(add_geometric_shape_w));
 }
 
 void on_add_poly1_clicked (GtkWidget *widget, gpointer data) {
 	isObject3D = false;
 	gtk_widget_show (GTK_WIDGET(add_poly_w));
+	gtk_widget_hide (GTK_WIDGET(add_geometric_shape_w));
 }
 
 void on_add_curve1_clicked (GtkWidget *widget, gpointer data) {
     gtk_widget_show (GTK_WIDGET(add_curve_w));
+    gtk_widget_hide (GTK_WIDGET(add_geometric_shape_w));
 }
 
 void on_add_object3D1_clicked (GtkWidget *widget, gpointer data) {
     gtk_widget_show (GTK_WIDGET(add_object3D_w));
+    gtk_widget_hide (GTK_WIDGET(add_geometric_shape_w));
 }
 
 void on_add_surface1_clicked (GtkWidget *widget, gpointer data) {
-    gtk_widget_show (GTK_WIDGET(add_surface_w));
+    gtk_widget_show (GTK_WIDGET(dim_surface_w));
+    gtk_widget_hide (GTK_WIDGET(add_geometric_shape_w));
 }
 
 void open_file_menu (GtkWidget *widget, gpointer data) {
@@ -327,6 +340,7 @@ void on_add_point_clicked (GtkWidget *widget, gpointer data) {
     gtk_entry_set_text(x1_point_entry,"");
     gtk_entry_set_text(y1_point_entry,"");
     gtk_entry_set_text(z1_point_entry,"");
+    gtk_widget_hide (GTK_WIDGET(add_point_w));
 }	 	  	 	     	  		  	  	    	      	 	
 
 /* ADD_LINE_W */
@@ -349,7 +363,7 @@ void on_add_line_clicked (GtkWidget *widget, gpointer data) {
     gtk_entry_set_text(y2_line_entry,"");  
     gtk_entry_set_text(z1_line_entry,"");
     gtk_entry_set_text(z2_line_entry,"");  
-
+    gtk_widget_hide (GTK_WIDGET(add_line_w));
 }
 
 /* ADD_POLY */
@@ -369,12 +383,14 @@ void on_add_poly_clicked (GtkWidget *widget, gpointer data) {
 	if (!isObject3D) {
 	    fill_treeview(name,"Polygon");
 	    viewport->addObject(polygon);  
+	    gtk_widget_hide (GTK_WIDGET(add_poly_w));
 	} else {
 	    faces_object3D.push_back(*polygon);
 	    gtk_widget_hide (GTK_WIDGET(add_poly_w));
 	}
 	polygon_coords.clear();
     gtk_entry_set_text(name_poly_entry, "");
+
 }	 	  	 	     	  		  	  	    	      	 	
 /* ADD CURVE */
 void on_add_point_curve_clicked (GtkWidget *widget, gpointer data) {
@@ -414,6 +430,7 @@ void on_add_curve_clicked (GtkWidget *widget, gpointer data) {
     gtk_entry_set_text(y_curve_entry, "");
     gtk_entry_set_text(z_curve_entry, "");
     gtk_entry_set_text(name_curve_entry, "");
+    gtk_widget_hide (GTK_WIDGET(add_curve_w));
 }	
 
 void on_add_face_clicked (GtkWidget *widget, gpointer data) {
@@ -427,6 +444,7 @@ void on_add_object3D_clicked (GtkWidget *widget, gpointer data) {
     fill_treeview(name,"Object3D");
     faces_object3D.clear();
     viewport->addObject(object);
+    gtk_widget_hide (GTK_WIDGET(add_object3D_w));
 }
 
 void on_add_point_surface_clicked (GtkWidget *widget, gpointer data) {
@@ -436,10 +454,11 @@ void on_add_point_surface_clicked (GtkWidget *widget, gpointer data) {
 
     int n = atoi(gtk_label_get_text(label_number_points_s));
     
-    if (n < 16) {
-        char buff[3];
-        sprintf(buff,"l%d%d",n/4+1,n%4+1);
-        GtkLabel* label_grid = GTK_LABEL(gtk_builder_get_object(builder, buff));
+    if (n < columns_s*rows_s) {
+        //char buff[3];
+        //sprintf(buff,"l%d%d",n/4+1,n%4+1);
+        GtkLabel* l21 = GTK_LABEL(gtk_builder_get_object(builder, "l21"));
+        GtkLabel* l41 = GTK_LABEL(gtk_builder_get_object(builder, "l41"));
         
         char buf[10];
         sprintf(buf, "  %d  ", ++n);
@@ -449,8 +468,15 @@ void on_add_point_surface_clicked (GtkWidget *widget, gpointer data) {
         surface_coords.push_back(coord);
         
         char point[64];
-        sprintf(point, "(%.2f,%.2f,%.2f)",x1,y1,z1);
-        gtk_label_set_text(label_grid, point);
+        sprintf(point, "(%.1f,%.1f,%.1f)",x1,y1,z1);
+        char next[64];
+        if(n == columns_s*rows_s) {
+            sprintf(next, "Completed");
+        } else {
+            sprintf(next, "(%d,%d)",n/columns_s+1,n%columns_s+1);
+        }
+        gtk_label_set_text(l21, next);
+        gtk_label_set_text(l41, point);
     }
     
     gtk_entry_set_text(x_surface_entry, "");
@@ -460,34 +486,41 @@ void on_add_point_surface_clicked (GtkWidget *widget, gpointer data) {
 
 void on_add_surface_clicked (GtkWidget *widget, gpointer data) {
   const gchar* name = gtk_entry_get_text(name_surface_entry);
-  if (gtk_toggle_button_get_active(bspline_checksurface)){
-        fill_treeview(name,"B-Spline Surface");
-        BSplineSurface* surface = new BSplineSurface(name, surface_coords);
-        viewport->addObject(surface);
-        surface_coords.clear();
-  } else if (gtk_toggle_button_get_active(bezier_checksurface)) {
-        fill_treeview(name,"Bezier Surface");
-        BezierSurface* surface = new BezierSurface(name, surface_coords);
-        viewport->addObject(surface);
-        surface_coords.clear();
-  } 
-  
-    gtk_label_set_text(label_number_points_s, "  0  ");
-    gtk_entry_set_text(x_surface_entry, "");
-    gtk_entry_set_text(y_surface_entry, "");
-    gtk_entry_set_text(z_surface_entry, "");
-    gtk_entry_set_text(name_surface_entry, "");
-    
-    char buff[3];
-    for(int i = 1; i <= 4; i++) {
-        for(int j = 1; j <=4; j++) {
-            sprintf(buff,"l%d%d",i,j);
-            GtkLabel* label_grid = GTK_LABEL(gtk_builder_get_object(builder, buff));
-            gtk_label_set_text(label_grid, "		");
-        }
-    }
+  if(surface_coords.size() == rows_s*columns_s) {
+	  if (gtk_toggle_button_get_active(bspline_checksurface)){
+	        fill_treeview(name,"B-Spline Surface");
+	        BSplineSurface* surface = new BSplineSurface(name, surface_coords);
+	        viewport->addObject(surface);
+	        surface_coords.clear();
+	  } else if (gtk_toggle_button_get_active(bezier_checksurface)) {
+	        fill_treeview(name,"Bezier Surface");
+	        BezierSurface* surface = new BezierSurface(name, surface_coords);
+	        viewport->addObject(surface);
+	        surface_coords.clear();
+	  } 
+	  
+	    gtk_label_set_text(label_number_points_s, "  0  ");
+	    gtk_entry_set_text(x_surface_entry, "");
+	    gtk_entry_set_text(y_surface_entry, "");
+	    gtk_entry_set_text(z_surface_entry, "");
+	    gtk_entry_set_text(name_surface_entry, "");
+	   
+	    GtkLabel* label_grid = GTK_LABEL(gtk_builder_get_object(builder, "l41"));
+	    gtk_label_set_text(label_grid, "		");
+	    label_grid = GTK_LABEL(gtk_builder_get_object(builder, "l21"));
+	    gtk_label_set_text(label_grid, "(1,1)");
+	        
+
+	gtk_widget_hide (GTK_WIDGET(add_surface_w));
+  }
 }
 
+void on_create_m_surface_clicked (GtkWidget *widget, gpointer dat) {
+	rows_s = gtk_spin_button_get_value_as_int(rows_surface);
+	columns_s = gtk_spin_button_get_value_as_int(columns_surface);
+	gtk_widget_hide (GTK_WIDGET(dim_surface_w));
+	gtk_widget_show (GTK_WIDGET(add_surface_w));
+}
 /* Buttons Change object */
 void on_angle_world_button_clicked (GtkWidget *widget, gpointer data) {
 	double angle = atof(gtk_entry_get_text(angle_world_entry));
@@ -809,6 +842,8 @@ int main (int argc, char *argv[]) {
     add_surface_w = gtk_builder_get_object (builder, "add_surface_w");
     g_signal_connect (add_surface_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
     
+    dim_surface_w = gtk_builder_get_object (builder, "dim_surface_w");
+    g_signal_connect (dim_surface_w, "delete_event", G_CALLBACK (gtk_widget_hide_on_delete), NULL);
 	/* Buttons point, line, poly, curve and object3D*/
 	add_point = GTK_BUTTON(gtk_builder_get_object(builder, "add_point"));
 	g_signal_connect (add_point, "clicked", G_CALLBACK (on_add_point_clicked), NULL);
@@ -839,6 +874,9 @@ int main (int argc, char *argv[]) {
     
     add_surface = GTK_BUTTON(gtk_builder_get_object(builder, "add_surface"));
     g_signal_connect (add_surface, "clicked", G_CALLBACK (on_add_surface_clicked), NULL);
+
+    create_m_surface = GTK_BUTTON(gtk_builder_get_object(builder, "create_m_surface"));
+    g_signal_connect (create_m_surface, "clicked", G_CALLBACK (on_create_m_surface_clicked), NULL);
     
 	/* Buttons Change object */
 	change_obj_w = gtk_builder_get_object (builder, "change_obj_w");
@@ -952,6 +990,8 @@ int main (int argc, char *argv[]) {
     label_number_points_s = GTK_LABEL(gtk_builder_get_object(builder, "label_number_points_s"));
     bspline_checksurface = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"bspline_checksurface"));
     bezier_checksurface = GTK_TOGGLE_BUTTON(gtk_builder_get_object(builder,"bezier_checksurface"));
+    rows_surface = GTK_SPIN_BUTTON(gtk_builder_get_object(builder,"rows_surface"));
+    columns_surface = GTK_SPIN_BUTTON(gtk_builder_get_object(builder,"columns_surface"));
     
     
 	gtk_widget_show(GTK_WIDGET(main_w));
